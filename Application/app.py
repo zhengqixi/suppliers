@@ -1,7 +1,8 @@
 import os
 import logging
 from typing import Tuple
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
+
 
 ######################################################################
 # Get bindings from the environment
@@ -9,16 +10,19 @@ from flask import Flask, jsonify
 DEBUG = os.getenv("DEBUG", "False") == "True"
 PORT = os.getenv("PORT", "5000")
 
+
 ######################################################################
 # Create Flask application
 ######################################################################
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
+
 ######################################################################
 # Storage for Suppliers
 ######################################################################
 suppliers = []
+
 
 ######################################################################
 # Application Routes

@@ -1,6 +1,7 @@
 """
-this file defines the model for a product
+This file defines the model for a product
 """
+
 import json
 
 
