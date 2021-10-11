@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import Tuple
 from flask import Flask, jsonify
 
 ######################################################################
@@ -15,10 +16,15 @@ app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
 ######################################################################
+# Storage for Suppliers
+######################################################################
+suppliers = []
+
+######################################################################
 # Application Routes
 ######################################################################
 @app.route("/")
-def index():
+def index() -> Tuple[Response, int]:
     """ Returns a message about the service """
     app.logger.info("Request for Index page")
     return (
@@ -27,6 +33,7 @@ def index():
         ),
         200,
     )
+
 
 ######################################################################
 #   M A I N
