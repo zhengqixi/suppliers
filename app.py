@@ -2,7 +2,7 @@ import os
 import logging
 from typing import Tuple
 from flask import Flask, jsonify, Response, request
-from Models.supplier import Supplier
+from models.supplier import Supplier
 from exceptions.supplier_exception import WrongArgType, MissingContactInfo
 
 ######################################################################
