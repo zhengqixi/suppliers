@@ -47,19 +47,9 @@ def create_supplier() -> Tuple[Response, int]:
     app.logger.info("request body: {}".format(request_body))
     if request_body is None:
         app.logger.info("bad request")
-        return (
-            jsonify(
-                error="no request body"
-            ),
-            400
-        )
+        return error_response("no request body", 400)
     if "name" not in request_body:
-        return (
-            jsonify(
-                error="missing name"
-            ),
-            400
-        )
+        return error_response("missing name", 400)
     new_id = len(suppliers) + 1
     new_name = request_body["name"]
     if "email" in request_body:
@@ -71,8 +61,6 @@ def create_supplier() -> Tuple[Response, int]:
     else:
         address = ""
     try:
-        error_msg = None
-        response_code = 200
         new_supplier = Supplier(
             name=new_name,
             id=new_id,
@@ -82,15 +70,19 @@ def create_supplier() -> Tuple[Response, int]:
         suppliers[new_id] = new_supplier
         app.logger.info("created new supplier with id {}".format(new_id))
     except (MissingContactInfo, WrongArgType) as e:
-        error_msg = str(e)
-        response_code = 400
+        return error_response(str(e), 400)
     finally:
-        return (
-            jsonify(
-                error=error_msg
-            ),
-            response_code
-        )
+        return new_supplier.to_json(), 200
+
+######################################################################
+#   Convenience functions
+######################################################################
+
+
+def error_response(msg: str, error_code: int) -> Tuple[Response, int]:
+    return jsonify(
+        error=msg
+    ), error_code
 
 
 ######################################################################
