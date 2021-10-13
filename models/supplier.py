@@ -4,7 +4,7 @@ This file defines the model for Supplier
 
 import json
 from typing import Dict, List, Set, Union
-from product import Product
+from models.product import Product
 from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
 
 
@@ -51,7 +51,7 @@ class Supplier:
             self.add_product(p)
 
     @property
-    def id(self) -> str:
+    def id(self) -> int:
         '''id of the supplier'''
         return self._id
 
@@ -78,7 +78,7 @@ class Supplier:
     @id.setter
     def id(self, id: int) -> None:
         self._check_id(id)
-        self._id = str(id).zfill(10)
+        self._id = id
 
     @name.setter
     def name(self, name: str) -> None:

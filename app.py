@@ -4,6 +4,7 @@ from typing import Tuple
 from flask import Flask, jsonify, Response, request
 from models.supplier import Supplier
 from exceptions.supplier_exception import WrongArgType, MissingContactInfo
+from database.database import Database
 
 ######################################################################
 # Get bindings from the environment
@@ -23,6 +24,7 @@ app.logger.setLevel(logging.INFO)
 # Storage for Suppliers
 ######################################################################
 suppliers = {}
+database = Database()
 
 
 ######################################################################
@@ -50,7 +52,6 @@ def create_supplier() -> Tuple[Response, int]:
         return error_response("no request body", 400)
     if "name" not in request_body:
         return error_response("missing name", 400)
-    new_id = len(suppliers) + 1
     new_name = request_body["name"]
     if "email" in request_body:
         email = request_body["email"]
@@ -63,16 +64,15 @@ def create_supplier() -> Tuple[Response, int]:
     try:
         new_supplier = Supplier(
             name=new_name,
-            id=new_id,
             email=email,
             address=address
         )
-        suppliers[new_id] = new_supplier
-        app.logger.info("created new supplier with id {}".format(new_id))
+        created_supplier = database.create_supplier(new_supplier)
+        app.logger.info(
+            "created new supplier with id {}".format(created_supplier.id))
     except (MissingContactInfo, WrongArgType) as e:
         return error_response(str(e), 400)
-    finally:
-        return new_supplier.to_json(), 200
+    return jsonify(id=created_supplier.id), 200
 
 ######################################################################
 #   Convenience functions
@@ -92,6 +92,4 @@ if __name__ == "__main__":
     app.logger.info("*" * 70)
     app.logger.info("   Seleton Flask For Supplier   ".center(70, "*"))
     app.logger.info("*" * 70)
-    import sys
-    app.logger.info(sys.path)
     app.run(host="0.0.0.0", port=int(PORT), debug=DEBUG)
