@@ -17,7 +17,10 @@ PORT = os.getenv("PORT", "5000")
 # Create Flask application
 ######################################################################
 app = Flask(__name__)
-app.logger.setLevel(logging.INFO)
+if DEBUG:
+    app.logger.setLevel(logging.DEBUG)
+else:
+    app.logger.setLevel(logging.INFO)
 
 
 ######################################################################

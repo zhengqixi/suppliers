@@ -1,5 +1,5 @@
-from Models.supplier import Supplier
-from Models.product import Product
+from models.supplier import Supplier
+from models.product import Product
 
 coke = Product("coke")
 coke.id = 1000
