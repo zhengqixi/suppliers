@@ -4,8 +4,8 @@ This file defines the model for Supplier
 
 import json
 from typing import Dict, List, Set, Union
-from Models.product import Product
-import Exception.supplier_exception as se
+from models.product import Product
+from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
 
 
 class Supplier:
@@ -39,10 +39,10 @@ class Supplier:
         self._check_address(address)
         self._check_products(products)
         if (email == "" and address == ""):
-            raise se.MissingContactInfo("At least one contact method "
-                                        "(email or address) is required")
+            raise MissingContactInfo("At least one contact method "
+                                     "(email or address) is required")
 
-        self._id = None  # DB provides ID
+        self._id = id
         self._name = name
         self._email = email
         self._address = address
@@ -51,7 +51,7 @@ class Supplier:
             self.add_product(p)
 
     @property
-    def id(self) -> str:
+    def id(self) -> int:
         '''id of the supplier'''
         return self._id
 
@@ -78,7 +78,7 @@ class Supplier:
     @id.setter
     def id(self, id: int) -> None:
         self._check_id(id)
-        self._id = str(id).zfill(10)
+        self._id = id
 
     @name.setter
     def name(self, name: str) -> None:
@@ -105,7 +105,7 @@ class Supplier:
         '''add a product to the supplier'''
         self._check_product(product)
         if product.id is None:
-            raise se.MissingProductId("Product %s has no id" % product.name)
+            raise MissingProductId("Product %s has no id" % product.name)
         self._products[product.id] = product
 
     def to_json(self) -> str:
@@ -117,40 +117,40 @@ class Supplier:
     def _check_id(self, id: int) -> None:
         '''check the type and the range of id'''
         if not isinstance(id, int):
-            raise se.WrongArgType("<class 'int'> expected for id, "
-                                  "got %s" % type(id))
+            raise WrongArgType("<class 'int'> expected for id, "
+                               "got %s" % type(id))
         elif (id >= 1e10 or id <= 0):
-            raise se.OutOfRange("id is not within range (0, 1e10), "
-                                "got %s" % id)
+            raise OutOfRange("id is not within range (0, 1e10), "
+                             "got %s" % id)
 
     def _check_name(self, name: str) -> None:
         '''check the type of name'''
         if not isinstance(name, str):
-            raise se.WrongArgType("<class 'str'> expected for name, "
-                                  "got %s" % type(name))
+            raise WrongArgType("<class 'str'> expected for name, "
+                               "got %s" % type(name))
 
     def _check_email(self, email: str) -> None:
         '''check the type of email'''
         # email format parser may needed
         if not isinstance(email, str):
-            raise se.WrongArgType("<class 'str'> expected for email, "
-                                  "got %s" % type(email))
+            raise WrongArgType("<class 'str'> expected for email, "
+                               "got %s" % type(email))
 
     def _check_address(self, address: str) -> None:
         '''check the type of address'''
         if not isinstance(address, str):
-            raise se.WrongArgType("<class 'str'> expected for address, "
-                                  "got %s" % type(address))
+            raise WrongArgType("<class 'str'> expected for address, "
+                               "got %s" % type(address))
 
     def _check_product(self, product: Product) -> None:
         '''check the type of product'''
         if not isinstance(product, Product):
-            raise se.WrongArgType("class<'Product'> expected for product, "
-                                  "got %s" % type(product))
+            raise WrongArgType("class<'Product'> expected for product, "
+                               "got %s" % type(product))
 
     def _check_products(self, products:
                         Union[List[Product], Set[Product]]) -> None:
         '''check the type of products'''
         if not isinstance(products, (List, Set)):
-            raise se.WrongArgType("class<'List'> or class<'Set'> expected "
-                                  "for products, got %s" % type(products))
+            raise WrongArgType("class<'List'> or class<'Set'> expected "
+                               "for products, got %s" % type(products))
