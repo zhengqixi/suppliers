@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 from flask import Flask, jsonify, Response, request
 from models.supplier import Supplier
-from exceptions.supplier_exception import WrongArgType, MissingContactInfo
+from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
 from database.database import Database
 
 ######################################################################
@@ -26,7 +26,7 @@ else:
 ######################################################################
 # Storage for Suppliers
 ######################################################################
-suppliers = {}
+suppliers = {} # don't need it, because database has a property _suppliers
 database = Database()
 
 
@@ -46,6 +46,7 @@ def index() -> Tuple[Response, int]:
 
 
 @app.route("/supplier", methods=["PUT"])
+#@app.route("/supplier", methods=["POST"])
 def create_supplier() -> Tuple[Response, int]:
     """ Creates a supplier and returns the ID """
     request_body = request.json
@@ -56,26 +57,40 @@ def create_supplier() -> Tuple[Response, int]:
     if "name" not in request_body:
         return error_response("missing name", 400)
     new_name = request_body["name"]
-    if "email" in request_body:
-        email = request_body["email"]
-    else:
-        email = ""
-    if "address" in request_body:
-        address = request_body["address"]
-    else:
-        address = ""
+    new_email = request_body["email"] if "email" in request_body else ""
+    new_address = request_body["address"] if "address" in request_body else ""
+    # have a question: is request_body["product"] a list or a set of Products?
+    new_products = request_body["products"] if "products" in request_body else []
     try:
         new_supplier = Supplier(
             name=new_name,
-            email=email,
-            address=address
+            email=new_email,
+            address=new_address,
+            products=new_products
         )
         created_supplier = database.create_supplier(new_supplier)
         app.logger.info(
             "created new supplier with id {}".format(created_supplier.id))
-    except (MissingContactInfo, WrongArgType) as e:
+    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
     return jsonify(id=created_supplier.id), 200
+
+
+@app.route("/supplier/<int:supplier_id>", methods=["GET"])
+def read_supplier(supplier_id) -> Tuple[Response, int]:
+    """ Reads a supplier by the id. """
+    app.logger.info('Reads a supplier with id: {}'.format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(not_found_msg)
+        return error_response(not_found_msg, 400)
+    # if found
+    found_msg = "Supplier with id: {} was found".format(supplier_id)
+    app.logger.info(found_msg)
+    return jsonify(id=supplier.id), 200
+
+
 
 ######################################################################
 #   Convenience functions
