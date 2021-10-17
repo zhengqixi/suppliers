@@ -31,3 +31,14 @@ class Database:
         supplier.id = new_id
         self._suppliers[new_id] = supplier
         return supplier
+
+    def find(self, supplier_id: int) -> Supplier:
+        '''
+        Finds a supplier with the id.
+        If found, returns the supplier. If not found, returns None.
+        '''
+        if supplier_id in self._suppliers:
+            return self._suppliers[supplier_id]
+        else:
+            return None
+
