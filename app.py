@@ -91,6 +91,44 @@ def read_supplier(supplier_id) -> Tuple[Response, int]:
     return jsonify(id=supplier.id), 200
 
 
+@app.route("/supplier/<int:supplier_id>", methods=["PUT"])
+def update_supplier(supplier_id) -> Tuple[Response, int]:
+    """ Updates a supplier by the id and returns the id """
+    app.logger.info('Updates a supplier with id: {}'.format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(not_found_msg)
+        return error_response(not_found_msg, 400)
+    # if found, update the supplier
+    found_msg = "Supplier with id: {} was found".format(supplier_id)
+    app.logger.info(found_msg)
+    request_body = request.json
+    app.logger.info("request body: {}".format(request_body))
+    if request_body is None:
+        app.logger.info("bad request")
+        return error_response("no request body", 400)
+    if "name" not in request_body:
+        return error_response("missing name", 400)
+    new_name = request_body["name"]
+    new_email = request_body["email"] if "email" in request_body else ""
+    new_address = request_body["address"] if "address" in request_body else ""
+    # have a question: is request_body["product"] a list or a set of Products?
+    new_products = request_body["products"] if "products" in request_body else []
+    try:
+        supplier.name = new_name
+        # if the new property is not empty, update the corresponding property
+        # another possible version: can remove these if conditions
+        if new_email:
+            supplier.email = new_email
+        if new_address:
+            supplier.address = new_address
+        if new_products:
+            supplier.products = new_products
+        app.logger.info("updated the supplier with id {}".format(supplier_id))
+    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+        return error_response(str(e), 400)
+    return jsonify(id=supplier_id), 200
 
 ######################################################################
 #   Convenience functions
