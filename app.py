@@ -26,7 +26,7 @@ else:
 ######################################################################
 # Storage for Suppliers
 ######################################################################
-suppliers = {} # don't need it, because database has a property _suppliers
+suppliers = {}
 database = Database()
 
 
@@ -46,7 +46,6 @@ def index() -> Tuple[Response, int]:
 
 
 @app.route("/supplier", methods=["PUT"])
-#@app.route("/supplier", methods=["POST"])
 def create_supplier() -> Tuple[Response, int]:
     """ Creates a supplier and returns the ID """
     request_body = request.json
@@ -59,8 +58,7 @@ def create_supplier() -> Tuple[Response, int]:
     new_name = request_body["name"]
     new_email = request_body["email"] if "email" in request_body else ""
     new_address = request_body["address"] if "address" in request_body else ""
-    # have a question: is request_body["product"] a list or a set of Products?
-    new_products = request_body["products"] if "products" in request_body else []
+    new_products = list(request_body["products"].values()) if "products" in request_body else []
     try:
         new_supplier = Supplier(
             name=new_name,
@@ -73,7 +71,7 @@ def create_supplier() -> Tuple[Response, int]:
             "created new supplier with id {}".format(created_supplier.id))
     except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
-    return jsonify(id=created_supplier.id), 200
+    return jsonify(id=created_supplier.id), 201
 
 
 @app.route("/supplier/<int:supplier_id>", methods=["GET"])
@@ -84,14 +82,14 @@ def read_supplier(supplier_id) -> Tuple[Response, int]:
     if not supplier:
         not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
         app.logger.info(not_found_msg)
-        return error_response(not_found_msg, 400)
+        return error_response(not_found_msg, 404)
     # if found
     found_msg = "Supplier with id: {} was found".format(supplier_id)
     app.logger.info(found_msg)
     return jsonify(id=supplier.id), 200
 
 
-@app.route("/supplier/<int:supplier_id>", methods=["PUT"])
+@app.route("/supplier/<int:supplier_id>", methods=["POST"])
 def update_supplier(supplier_id) -> Tuple[Response, int]:
     """ Updates a supplier by the id and returns the id """
     app.logger.info('Updates a supplier with id: {}'.format(supplier_id))
@@ -99,7 +97,7 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
     if not supplier:
         not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
         app.logger.info(not_found_msg)
-        return error_response(not_found_msg, 400)
+        return error_response(not_found_msg, 404)
     # if found, update the supplier
     found_msg = "Supplier with id: {} was found".format(supplier_id)
     app.logger.info(found_msg)
@@ -113,12 +111,10 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
     new_name = request_body["name"]
     new_email = request_body["email"] if "email" in request_body else ""
     new_address = request_body["address"] if "address" in request_body else ""
-    # have a question: is request_body["product"] a list or a set of Products?
-    new_products = request_body["products"] if "products" in request_body else []
+    new_products = list(request_body["products"].values()) if "products" in request_body else []
     try:
         supplier.name = new_name
         # if the new property is not empty, update the corresponding property
-        # another possible version: can remove these if conditions
         if new_email:
             supplier.email = new_email
         if new_address:
