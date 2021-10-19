@@ -1,4 +1,5 @@
-from exceptions.supplier_exception import MissingContactInfo, WrongArgType, OutOfRange, MissingProductId
+from exceptions.supplier_exception\
+    import MissingContactInfo, WrongArgType, OutOfRange
 
 
 def test_raise_missing_contact_info():
@@ -19,11 +20,4 @@ def test_raise_out_of_range():
     try:
         raise OutOfRange()
     except OutOfRange:
-        assert True is True
-
-
-def test_missing_product_id():
-    try:
-        raise MissingProductId()
-    except MissingProductId:
         assert True is True

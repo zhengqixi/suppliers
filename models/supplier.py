@@ -3,8 +3,9 @@ This file defines the model for Supplier
 '''
 
 import json
-from typing import Dict, List, Set, Union
-from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
+from typing import List, Set, Union
+from exceptions.supplier_exception \
+    import MissingContactInfo, WrongArgType, OutOfRange
 
 
 class Supplier:
@@ -31,23 +32,18 @@ class Supplier:
         products: Union[List[Product], Set[Product]], optional
             The products of the supplier (default is [])
         """
+        self._id = id
+        self._name = name
+        self._email = email
+        self._address = address
+        self._products = list(products)
+
         if id is not None:
             self._check_id(id)
         self._check_name(name)
         self._check_email(email)
         self._check_address(address)
         self._check_products(products)
-        if (email == "" and address == ""):
-            raise MissingContactInfo("At least one contact method "
-                                     "(email or address) is required")
-
-        self._id = id
-        self._name = name
-        self._email = email
-        self._address = address
-        self._products = []
-        for p in products:
-            self.add_product(p)
 
     @property
     def id(self) -> int:
@@ -97,15 +93,11 @@ class Supplier:
     @products.setter
     def products(self, products: Union[List[int], Set[int]]) -> None:
         self._check_products(products)
-        self._products = []
-        for p in products:
-            self.add_product(p)
+        self._products = products
 
     def add_product(self, product: int) -> None:
         '''add a product to the supplier'''
         self._check_product(product)
-        if product is None:
-            raise MissingProductId("None is not a valid Product ID")
         self._products.append(product)
 
     def to_json(self) -> str:
@@ -120,7 +112,7 @@ class Supplier:
             raise WrongArgType("<class 'int'> expected for id, "
                                "got %s" % type(id))
         elif (id >= 1e10 or id <= 0):
-            raise OutOfRange("id is not within range (0, 1e10), "
+            raise OutOfRange("supplier id is not within range (0, 1e10), "
                              "got %s" % id)
 
     def _check_name(self, name: str) -> None:
@@ -135,18 +127,27 @@ class Supplier:
         if not isinstance(email, str):
             raise WrongArgType("<class 'str'> expected for email, "
                                "got %s" % type(email))
+        if (email == "" and self._address == ""):
+            raise MissingContactInfo("At least one contact method "
+                                     "(email or address) is required")
 
     def _check_address(self, address: str) -> None:
         '''check the type of address'''
         if not isinstance(address, str):
             raise WrongArgType("<class 'str'> expected for address, "
                                "got %s" % type(address))
+        if (self._email == "" and address == ""):
+            raise MissingContactInfo("At least one contact method "
+                                     "(email or address) is required")
 
     def _check_product(self, product: int) -> None:
-        '''check the type of product'''
+        '''check the type and the range of product id'''
         if not isinstance(product, int):
-            raise WrongArgType("<class 'int'> expected for product, "
+            raise WrongArgType("class<'int'> expected for product id, "
                                "got %s" % type(product))
+        elif (product >= 1e15 or product <= 0):
+            raise OutOfRange("product id is not within range (0, 1e15), "
+                             "got %s" % id)
 
     def _check_products(self, products:
                         Union[List[int], Set[int]]) -> None:
@@ -154,3 +155,5 @@ class Supplier:
         if not isinstance(products, (List, Set)):
             raise WrongArgType("class<'List'> or class<'Set'> expected "
                                "for products, got %s" % type(products))
+        for p in products:
+            self._check_product(p)
