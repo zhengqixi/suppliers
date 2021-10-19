@@ -46,7 +46,7 @@ def test_read_correct():
             'address': 'New York',
             'products': [1, 2, 3]
             }), content_type='application/json')
-    response = test.get('/supplier/1')
+    response = test_app.get('/supplier/1')
     assert response is not None
     assert response.is_json
     assert response.status_code == 200
