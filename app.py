@@ -58,7 +58,7 @@ def create_supplier() -> Tuple[Response, int]:
     new_name = request_body["name"]
     new_email = request_body["email"] if "email" in request_body else ""
     new_address = request_body["address"] if "address" in request_body else ""
-    new_products = list(request_body["products"].values()) if "products" in request_body else []
+    new_products = request_body["products"] if "products" in request_body else []
     try:
         new_supplier = Supplier(
             name=new_name,
@@ -111,7 +111,7 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
     new_name = request_body["name"]
     new_email = request_body["email"] if "email" in request_body else ""
     new_address = request_body["address"] if "address" in request_body else ""
-    new_products = list(request_body["products"].values()) if "products" in request_body else []
+    new_products = request_body["products"] if "products" in request_body else []
     try:
         supplier.name = new_name
         # if the new property is not empty, update the corresponding property
