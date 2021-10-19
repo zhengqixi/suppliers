@@ -5,7 +5,7 @@ This file defines the model for Supplier
 import json
 from typing import List, Set, Union
 from exceptions.supplier_exception \
-    import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
+    import MissingContactInfo, WrongArgType, OutOfRange
 
 
 class Supplier:
@@ -32,21 +32,18 @@ class Supplier:
         products: Union[List[Product], Set[Product]], optional
             The products of the supplier (default is [])
         """
+        self._id = id
+        self._name = name
+        self._email = email
+        self._address = address
+        self._products = list(products)
+
         if id is not None:
             self._check_id(id)
         self._check_name(name)
         self._check_email(email)
         self._check_address(address)
         self._check_products(products)
-        if (email == "" and address == ""):
-            raise MissingContactInfo("At least one contact method "
-                                     "(email or address) is required")
-
-        self._id = id
-        self._name = name
-        self._email = email
-        self._address = address
-        self._products = list(products)
 
     @property
     def id(self) -> int:
@@ -101,8 +98,6 @@ class Supplier:
     def add_product(self, product: int) -> None:
         '''add a product to the supplier'''
         self._check_product(product)
-        if product is None:
-            raise MissingProductId("Product has no id")
         self._products.append(product)
 
     def to_json(self) -> str:
