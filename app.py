@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 from flask import Flask, jsonify, Response, request
 from models.supplier import Supplier
-from exceptions.supplier_exception import WrongArgType, MissingContactInfo
+from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
 from database.database import Database
 
 ######################################################################
@@ -56,26 +56,93 @@ def create_supplier() -> Tuple[Response, int]:
     if "name" not in request_body:
         return error_response("missing name", 400)
     new_name = request_body["name"]
-    if "email" in request_body:
-        email = request_body["email"]
-    else:
-        email = ""
-    if "address" in request_body:
-        address = request_body["address"]
-    else:
-        address = ""
+    new_email = request_body["email"] if "email" in request_body else ""
+    new_address = request_body["address"] if "address" in request_body else ""
+    new_products = request_body["products"] if "products" in request_body else []
     try:
         new_supplier = Supplier(
             name=new_name,
-            email=email,
-            address=address
+            email=new_email,
+            address=new_address,
+            products=new_products
         )
         created_supplier = database.create_supplier(new_supplier)
         app.logger.info(
             "created new supplier with id {}".format(created_supplier.id))
-    except (MissingContactInfo, WrongArgType) as e:
+    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
-    return jsonify(id=created_supplier.id), 200
+    return jsonify(
+        id=created_supplier.id,
+        name=created_supplier.name,
+        email=created_supplier.email,
+        address=created_supplier.address,
+        products=created_supplier.products
+    ), 201
+
+
+@app.route("/supplier/<int:supplier_id>", methods=["GET"])
+def read_supplier(supplier_id) -> Tuple[Response, int]:
+    """ Reads a supplier by the id. """
+    app.logger.info('Reads a supplier with id: {}'.format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(not_found_msg)
+        return error_response(not_found_msg, 404)
+    # if found
+    found_msg = "Supplier with id: {} was found".format(supplier_id)
+    app.logger.info(found_msg)
+    return jsonify(
+        id=supplier.id,
+        name=supplier.name,
+        email=supplier.email,
+        address=supplier.address,
+        products=supplier.products
+    ), 200
+
+
+@app.route("/supplier/<int:supplier_id>", methods=["POST"])
+def update_supplier(supplier_id) -> Tuple[Response, int]:
+    """ Updates a supplier by the id and returns the id """
+    app.logger.info('Updates a supplier with id: {}'.format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        not_found_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(not_found_msg)
+        return error_response(not_found_msg, 404)
+    # if found, update the supplier
+    found_msg = "Supplier with id: {} was found".format(supplier_id)
+    app.logger.info(found_msg)
+    request_body = request.json
+    app.logger.info("request body: {}".format(request_body))
+    if request_body is None:
+        app.logger.info("bad request")
+        return error_response("no request body", 400)
+    if "name" not in request_body:
+        return error_response("missing name", 400)
+    new_name = request_body["name"]
+    new_email = request_body["email"] if "email" in request_body else ""
+    new_address = request_body["address"] if "address" in request_body else ""
+    new_products = request_body["products"] if "products" in request_body else []
+    try:
+        supplier.name = new_name
+        # if the new property is not empty, update the corresponding property
+        if new_email:
+            supplier.email = new_email
+        if new_address:
+            supplier.address = new_address
+        if new_products:
+            supplier.products = new_products
+        app.logger.info("updated the supplier with id {}".format(supplier_id))
+    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+        return error_response(str(e), 400)
+    return jsonify(
+        id=supplier.id,
+        name=supplier.name,
+        email=supplier.email,
+        address=supplier.address,
+        products=supplier.products
+    ), 200
 
 ######################################################################
 #   Convenience functions
