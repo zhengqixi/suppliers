@@ -71,7 +71,7 @@ def create_supplier() -> Tuple[Response, int]:
             "created new supplier with id {}".format(created_supplier.id))
     except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
-    return jsonify(id=created_supplier.id), 201
+    return jsonify(id=created_supplier.id), 200
 
 
 @app.route("/supplier/<int:supplier_id>", methods=["GET"])
@@ -86,7 +86,13 @@ def read_supplier(supplier_id) -> Tuple[Response, int]:
     # if found
     found_msg = "Supplier with id: {} was found".format(supplier_id)
     app.logger.info(found_msg)
-    return jsonify(id=supplier.id), 200
+    return jsonify(
+        id=supplier.id,
+        name=supplier.name,
+        email=supplier.email,
+        address=supplier.address,
+        products=supplier.products
+    ), 200
 
 
 @app.route("/supplier/<int:supplier_id>", methods=["POST"])
@@ -124,7 +130,13 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
         app.logger.info("updated the supplier with id {}".format(supplier_id))
     except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
-    return jsonify(id=supplier_id), 200
+    return jsonify(
+        id=supplier.id,
+        name=supplier.name,
+        email=supplier.email,
+        address=supplier.address,
+        products=supplier.products
+    ), 200
 
 ######################################################################
 #   Convenience functions
