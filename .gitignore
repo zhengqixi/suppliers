@@ -1,2 +1,7 @@
 __pycache__
 .vagrant
+
+# Test reports
+unittests.xml
+coverage.xml
+.coverage

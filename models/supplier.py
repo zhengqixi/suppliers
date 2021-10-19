@@ -4,7 +4,6 @@ This file defines the model for Supplier
 
 import json
 from typing import Dict, List, Set, Union
-from models.product import Product
 from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
 
 
@@ -16,7 +15,7 @@ class Supplier:
 
     def __init__(self, name: str, id: int = None,
                  email: str = "", address: str = "",
-                 products: Union[List[Product], Set[Product]] = []) -> None:
+                 products: Union[List[int], Set[int]] = []) -> None:
         """
         Parameters
         ----------
@@ -46,7 +45,7 @@ class Supplier:
         self._name = name
         self._email = email
         self._address = address
-        self._products = {}
+        self._products = []
         for p in products:
             self.add_product(p)
 
@@ -71,7 +70,7 @@ class Supplier:
         return self._address
 
     @property
-    def products(self) -> Dict[str, Product]:
+    def products(self) -> List[int]:
         '''products of the supplier'''
         return self._products
 
@@ -96,17 +95,18 @@ class Supplier:
         self._address = address
 
     @products.setter
-    def products(self, products: Union[List[Product], Set[Product]]) -> None:
+    def products(self, products: Union[List[int], Set[int]]) -> None:
         self._check_products(products)
+        self._products = []
         for p in products:
             self.add_product(p)
 
-    def add_product(self, product: Product) -> None:
+    def add_product(self, product: int) -> None:
         '''add a product to the supplier'''
         self._check_product(product)
-        if product.id is None:
-            raise MissingProductId("Product %s has no id" % product.name)
-        self._products[product.id] = product
+        if product is None:
+            raise MissingProductId("None is not a valid Product ID")
+        self._products.append(product)
 
     def to_json(self) -> str:
         '''convert the supplier to JSON formatted string'''
@@ -142,14 +142,14 @@ class Supplier:
             raise WrongArgType("<class 'str'> expected for address, "
                                "got %s" % type(address))
 
-    def _check_product(self, product: Product) -> None:
+    def _check_product(self, product: int) -> None:
         '''check the type of product'''
-        if not isinstance(product, Product):
-            raise WrongArgType("class<'Product'> expected for product, "
+        if not isinstance(product, int):
+            raise WrongArgType("<class 'int'> expected for product, "
                                "got %s" % type(product))
 
     def _check_products(self, products:
-                        Union[List[Product], Set[Product]]) -> None:
+                        Union[List[int], Set[int]]) -> None:
         '''check the type of products'''
         if not isinstance(products, (List, Set)):
             raise WrongArgType("class<'List'> or class<'Set'> expected "
