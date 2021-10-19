@@ -11,7 +11,7 @@ def test_create_happy_path():
                                 'email': 'nice'
                             }), content_type='application/json')
     assert response is not None
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.is_json
     assert 'id' in response.json
 
