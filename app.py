@@ -71,7 +71,13 @@ def create_supplier() -> Tuple[Response, int]:
             "created new supplier with id {}".format(created_supplier.id))
     except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
-    return jsonify(id=created_supplier.id), 200
+    return jsonify(
+        id=created_supplier.id,
+        name=created_supplier.name,
+        email=created_supplier.email,
+        address=created_supplier.address,
+        products=created_supplier.products
+    ), 201
 
 
 @app.route("/supplier/<int:supplier_id>", methods=["GET"])
