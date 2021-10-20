@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 from flask import Flask, jsonify, Response, request
 from models.supplier import Supplier
-from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
+from exceptions.supplier_exception import MissingContactInfo, WrongArgType, OutOfRange
 from database.database import Database
 
 ######################################################################
@@ -69,7 +69,7 @@ def create_supplier() -> Tuple[Response, int]:
         created_supplier = database.create_supplier(new_supplier)
         app.logger.info(
             "created new supplier with id {}".format(created_supplier.id))
-    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+    except (MissingContactInfo, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
     return jsonify(
         id=created_supplier.id,
@@ -134,7 +134,7 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
         if new_products:
             supplier.products = new_products
         app.logger.info("updated the supplier with id {}".format(supplier_id))
-    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+    except (MissingContactInfo, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
     return jsonify(
         id=supplier.id,
@@ -143,6 +143,32 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
         address=supplier.address,
         products=supplier.products
     ), 200
+
+@app.route("/supplier/<int:supplier_id>", methods=["DELETE"])
+def delete_supplier(supplier_id) -> Tuple[Response, int]:
+    """Deletes a supplier"""
+    app.logger.info("Deletes a supplier with id: {}".format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        missing_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(missing_msg)
+        return error_response(missing_msg, 400)
+    database.delete_supplier(id)
+    deleted_msg = "Supplier with id: {} was deleted".format(supplier_id)
+    app.logger.info(deleted_msg)
+    return jsonify(id=supplier.id,), 200
+
+
+@app.route("/suppliers", methods=["GET"])
+def list_all_suppliers() -> Tuple[Response, int]:
+    '''List all suppliers'''
+    app.logger.info("List all suppliers")
+    suppliers = database.get_suppliers()
+    results = []
+    for sup in suppliers.values():
+        if sup is not None:
+            results.append(sup.to_json())
+    return jsonify(results), 200
 
 ######################################################################
 #   Convenience functions
