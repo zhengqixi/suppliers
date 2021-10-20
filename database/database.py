@@ -51,8 +51,5 @@ class Database:
         logging.info("deleting a supplier from database")
         self._suppliers[id] = None
 
-
     def get_suppliers(self) -> Dict[int, Supplier]:
         return self._suppliers
-
-
