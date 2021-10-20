@@ -1,3 +1,4 @@
+from typing import Dict
 from models.supplier import Supplier
 import logging
 
@@ -41,4 +42,17 @@ class Database:
             return self._suppliers[supplier_id]
         else:
             return None
+
+    def delete_supplier(self, id) -> None:
+        '''
+        To avoid possible conflict, delete function is impelmented
+        by setting its id pointing to None.
+        '''
+        logging.info("deleting a supplier from database")
+        self._suppliers[id] = None
+
+
+    def get_suppliers(self) -> Dict[int, Supplier]:
+        return self._suppliers
+
 

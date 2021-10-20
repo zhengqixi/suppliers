@@ -144,6 +144,32 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
         products=supplier.products
     ), 200
 
+@app.route("/supplier/<int:supplier_id>", methods=["DELETE"])
+def delete_supplier(supplier_id) -> Tuple[Response, int]:
+    """Deletes a supplier"""
+    app.logger.info("Deletes a supplier with id: {}".format(supplier_id))
+    supplier = database.find(supplier_id)
+    if not supplier:
+        missing_msg = "Supplier with id: {} was not found".format(supplier_id)
+        app.logger.info(missing_msg)
+        return error_response(missing_msg, 400)
+    database.delete_supplier(id)
+    deleted_msg = "Supplier with id: {} was deleted".format(supplier_id)
+    app.logger.info(deleted_msg)
+    return jsonify(id=supplier.id,), 200
+
+
+@app.route("/suppliers", methods=["GET"])
+def list_all_suppliers() -> Tuple[Response, int]:
+    '''List all suppliers'''
+    app.logger.info("List all suppliers")
+    suppliers = database.get_suppliers()
+    results = []
+    for sup in suppliers.values():
+        if sup is not None:
+            results.append(sup.to_json())
+    return jsonify(results), 200
+
 ######################################################################
 #   Convenience functions
 ######################################################################
