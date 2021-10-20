@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 from flask import Flask, jsonify, Response, request
 from models.supplier import Supplier
-from exceptions.supplier_exception import MissingContactInfo, MissingProductId, WrongArgType, OutOfRange
+from exceptions.supplier_exception import MissingContactInfo, WrongArgType, OutOfRange
 from database.database import Database
 
 ######################################################################
@@ -69,7 +69,7 @@ def create_supplier() -> Tuple[Response, int]:
         created_supplier = database.create_supplier(new_supplier)
         app.logger.info(
             "created new supplier with id {}".format(created_supplier.id))
-    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+    except (MissingContactInfo, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
     return jsonify(
         id=created_supplier.id,
@@ -134,7 +134,7 @@ def update_supplier(supplier_id) -> Tuple[Response, int]:
         if new_products:
             supplier.products = new_products
         app.logger.info("updated the supplier with id {}".format(supplier_id))
-    except (MissingContactInfo, MissingProductId, WrongArgType, OutOfRange) as e:
+    except (MissingContactInfo, WrongArgType, OutOfRange) as e:
         return error_response(str(e), 400)
     return jsonify(
         id=supplier.id,

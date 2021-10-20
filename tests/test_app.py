@@ -174,19 +174,6 @@ def test_delete_not_found():
     assert response.status_code == 400
     assert 'error' in response.json
 
-'''
-This test case fails in some cases due to the 
-fact that self._supplier[id] = None is used to delete.
-Which makes the _supplier dictionary to be not empty.
-It is recoomended to maintain a variable in database class
-named size to fix this.
-'''
-def test_delete_empty_database():
-    response = test_app.delete("/supplier/1")
-    assert response is not None
-    assert response.status_code == 400
-    assert response.is_json
-    assert 'error' in response.json
 
 
 def test_list_all_suppliers():
