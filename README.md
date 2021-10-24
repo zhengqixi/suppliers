@@ -1,6 +1,6 @@
 # suppliers
 
-![Build Status](https://github.com/zhengqixi/suppliers/actions/workflows/python.yml/badge.svg)
+[![Build Status](https://github.com/zhengqixi/suppliers/actions/workflows/python.yml/badge.svg)](https://github.com/zhengqixi/suppliers/actions/workflows/python.yml)
 
 ## Running service
 
