@@ -1,6 +1,6 @@
 # suppliers
 
-[build status](https://github.com/zhengqixi/suppliers/tree/main/.github/workflows/badge.svg)
+![Build Status](https://github.com/zhengqixi/suppliers/tree/main/.github/workflows/badge.svg)
 
 ## Running service
 
