@@ -1,8 +1,8 @@
 # suppliers
 
-[![Build Status](https://github.com/zhengqixi/suppliers/actions/workflows/python.yml/badge.svg)](https://github.com/zhengqixi/suppliers/actions/workflows/python.yml)
+[![Build Status](https://github.com/Supplier-Squad-NYU/suppliers/actions/workflows/python.yml/badge.svg)](https://github.com/Supplier-Squad-NYU/suppliers/actions/workflows/python.yml)
 
-[![codecov](https://codecov.io/gh/zhengqixi/suppliers/branch/main/graph/badge.svg?token=3VVJOBW8TK)](https://codecov.io/gh/zhengqixi/suppliers)
+[![codecov](https://codecov.io/gh/Supplier-Squad-NYU/suppliers/branch/main/graph/badge.svg?token=AD8XDW91AM)](https://codecov.io/gh/Supplier-Squad-NYU/suppliers)
 
 ## Running service
 
