@@ -45,10 +45,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y postgresql-client
-    
-    - name: Create testdb
-      run: |
-        psql -h postgres -U postgres -c 'create database testdb;'
+        psql -h localhost -U postgres -c 'create database testdb;'
 
     - name: Run tests
       run: |
