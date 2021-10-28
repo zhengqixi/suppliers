@@ -11,7 +11,7 @@ import unittest
 from service.supplier import Supplier, db
 from service import app
 import logging
-from exceptions.supplier_exception \
+from service.supplier_exception \
     import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError
 
 DATABASE_URI = os.getenv(

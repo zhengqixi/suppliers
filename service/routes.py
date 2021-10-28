@@ -3,7 +3,7 @@ import logging
 from typing import Tuple
 from flask import jsonify, Response, request
 from service.supplier import Supplier
-from exceptions.supplier_exception import WrongArgType, MissingInfo
+from service.supplier_exception import WrongArgType, MissingInfo
 from . import app
 
 ######################################################################
