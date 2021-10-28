@@ -8,7 +8,7 @@ from typing import List, Set, Union
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
-from exceptions.supplier_exception \
+from service.supplier_exception \
     import MissingInfo, WrongArgType, \
     UserDefinedIdError, OutOfRange
 
