@@ -46,6 +46,8 @@ jobs:
         sudo apt update
         sudo apt install -y postgresql-client
         psql -h localhost -U postgres -c 'create database testdb;'
+      env:
+        PGPASSWORD: postgres
 
     - name: Run tests
       run: |
