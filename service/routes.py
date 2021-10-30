@@ -1,9 +1,9 @@
-import sys
 import os
-sys.path.append(os.path.dirname(sys.path[0]))
 import logging
 from typing import Tuple
-from flask import jsonify, Response, request, make_response, Flask
+from flask import jsonify, Response, request, make_response
+from werkzeug.exceptions import abort
+
 from service import error_handlers, status, supplier, app
 
 ######################################################################
@@ -29,23 +29,17 @@ else:
 def index() -> Tuple[Response, int]:
     """ Returns a message about the service """
     app.logger.info("Request for Index page")
-    return (
-        jsonify(
-            name="Hello World from Supplier team"
-        ),
-        200,
-    )
+    message = "Hello World from Supplier team"
+    return make_response(jsonify(name=message),status.HTTP_200_OK,)
 
 
 @app.route("/suppliers", methods=["POST"])
 def create_supplier() -> Tuple[Response, int]:
-    """ Creates a supplier and returns the ID """
+    """ Creates a supplier and returns the supplier as a dict """
+
+    check_content_type("application/json")
     request_body = request.json
     app.logger.info("request body: {}".format(request_body))
-
-    if request_body is None:
-        app.logger.info("missing body bad request")
-        return error_handlers.bad_request("missing body")
 
     if "name" not in request_body:
         return error_handlers.bad_request("missing name")
@@ -54,8 +48,7 @@ def create_supplier() -> Tuple[Response, int]:
     new_supplier.create()
     message = new_supplier.serialize_to_dict()
 
-    app.logger.info(
-        "created new supplier with id {}".format(new_supplier.id))
+    app.logger.info("created new supplier with id {}".format(new_supplier.id))
 
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
@@ -79,4 +72,18 @@ def create_supplier() -> Tuple[Response, int]:
 #     app.logger.info("*" * 70)
 #     app.run(host="0.0.0.0", port=int(PORT), debug=DEBUG)
 
-    #test_routes.TestSupplierServer.test_create_supplier()
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

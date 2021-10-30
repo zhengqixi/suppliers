@@ -123,7 +123,7 @@ class TestSupplierServer(unittest.TestCase):
         )
 
     def test_create_supplier_without_name(self):
-        """test_create_supplier_without_name"""
+        """Create a Supplier with no name"""
         test_supplier = {
             "email": "a0@purdue.edu",
             "address": "asd",
@@ -135,9 +135,7 @@ class TestSupplierServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_supplier_without_body(self):
-        """test_create_supplier_without_body"""
-        resp = self.app.post(
-            BASE_URL, json=None, content_type=CONTENT_TYPE_JSON
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_create_supplier_without_content_type(self):
+        """Create a Supplier with no content type"""
+        resp = self.app.post(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
