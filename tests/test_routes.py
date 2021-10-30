@@ -41,6 +41,8 @@ import os
 import logging
 import unittest
 
+from flask_sqlalchemy import SQLAlchemy
+
 from service import status  # HTTP Status Codes
 from service.supplier import db, init_db, Supplier
 from service.routes import app
@@ -51,11 +53,10 @@ logging.disable(logging.CRITICAL)
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/suppliers"
 CONTENT_TYPE_JSON = "application/json"
-
 
 ######################################################################
 #  T E S T   C A S E S
