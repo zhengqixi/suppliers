@@ -1,5 +1,6 @@
 __pycache__
 .vagrant
+.idea
 
 # Test reports
 unittests.xml
