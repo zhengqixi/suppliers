@@ -1,7 +1,7 @@
 """
 Test Factory to make fake objects for testing
 """
-import numpy as np
+import random
 import factory
 from factory.fuzzy import FuzzyChoice
 from service.supplier import Supplier
@@ -18,4 +18,4 @@ class SupplierFactory(factory.Factory):
     email = str(name) + "@gmail.com"
     address = FuzzyChoice(
         choices=["New York", "Chicago", "Los Angeles", "San Francisco"])
-    products = list(np.random.permutation(np.arange(1, 101))[:3])
+    products = random.sample(range(1, 101), 3)
