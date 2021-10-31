@@ -10,6 +10,7 @@ import os
 import unittest
 from service.supplier import Supplier, db
 from service import app
+from werkzeug.exceptions import NotFound
 import logging
 from service.supplier_exception \
     import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError
@@ -164,3 +165,37 @@ class TestSupplierModel(unittest.TestCase):
         self.assertEqual(supplier.id, 2)
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
+
+    def test_find_supplier_exists(self):
+        """
+        Creates a supplier and asserts that we can find it
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        found_supplier = Supplier.find(supplier.id)
+        self.assertEqual(supplier, found_supplier)
+
+    def test_find_supplier_does_not_exist(self):
+        """
+        Looks for a non-existent supplier. 
+        Asserts that NotFound is raised
+        """
+        self.assertRaises(NotFound, Supplier.find, 0)
+
+    def test_update_supplier(self):
+        """
+        Creates a Supplier
+        Update the supplier
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        supplier.update({
+            "name": "Super Ken",
+            "address": "super ken home"
+        })
+        updated_supplier = Supplier.find(supplier.id)
+        self.assertEqual(updated_supplier.name, "Super Ken")
+        self.assertEqual(updated_supplier.address, "super ken home")
+        self.assertEqual(updated_supplier.email, "Ken@gmail.com")
