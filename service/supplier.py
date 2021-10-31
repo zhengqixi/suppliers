@@ -30,8 +30,8 @@ class Supplier(db.Model):
     app: Flask = None
     __tablename__ = "supplier"
     __table_args__ = (
-            db.CheckConstraint('NOT(email IS NULL AND address IS NULL)'),
-            )
+        db.CheckConstraint('NOT(email IS NULL AND address IS NULL)'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63), nullable=False)
@@ -85,10 +85,18 @@ class Supplier(db.Model):
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
-    def all(cls) -> list:
+    def all(cls) -> List["Supplier"]:
         """Returns all of the suppliers in the database"""
         logger.info("Processing all suppliers")
         return cls.query.all()
+
+    @classmethod
+    def find(cls, supplier_id: int) -> "Supplier":
+        """ 
+        Finds a supplier with the provided int
+        Throws NotFound if none is found
+        """
+        return cls.query.get_or_404(supplier_id)
 
     ##################################################
     # STATIC METHODS
@@ -142,6 +150,18 @@ class Supplier(db.Model):
             db.session.commit()
         except Exception:
             db.session.rollback()
+
+    def update(self, data: dict) -> "Supplier":
+        """
+        Updates self with data in dict
+        Saves changes to the database
+        """
+        self.id = data["id"] if "id" in data else self.id
+        self.name = data["name"] if "name" in data else self.name
+        self.email = data["email"] if "email" in data else self.email
+        self.address = data["address"] if "address" in data else self.address
+        self.products = data["products"] if "products" in data else self.products
+        db.session.commit()
 
     def serialize_to_dict(self) -> dict:
         """Serializes a supplier into a dictionary"""
