@@ -183,8 +183,8 @@ class TestSupplierModel(unittest.TestCase):
         self.assertIsNot(supplier, None)
         self.assertEqual(supplier.id, suppliers[1].id)
         self.assertEqual(supplier.name, suppliers[1].name)
-        self.assertEqual(supplier.email, supplier[1].email)
-        self.assertEqual(supplier.products, supplier[1].products)
+        self.assertEqual(supplier.email, suppliers[1].email)
+        self.assertEqual(supplier.products, suppliers[1].products)
 
     def test_find_or_404_found(self):
         """Find or return 404 found"""
@@ -203,8 +203,8 @@ class TestSupplierModel(unittest.TestCase):
         self.assertIsNot(supplier, None)
         self.assertEqual(supplier.id, suppliers[1].id)
         self.assertEqual(supplier.name, suppliers[1].name)
-        self.assertEqual(supplier.email, supplier[1].email)
-        self.assertEqual(supplier.products, supplier[1].products)
+        self.assertEqual(supplier.email, suppliers[1].email)
+        self.assertEqual(supplier.products, suppliers[1].products)
 
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
