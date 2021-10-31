@@ -10,6 +10,7 @@ import os
 import unittest
 from werkzeug.exceptions import NotFound
 from service.supplier import Supplier, db
+from .factories import SupplierFactory
 from service import app
 import logging
 from service.supplier_exception \
@@ -168,11 +169,7 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_find_supplier(self):
         """Find a Supplier by ID"""
-        suppliers = [
-        Supplier(name="abc", email="abc@gmail.com", products=[1, 2, 3]),
-        Supplier(name="def", email="def@gmail.com", address="nyu", products=[4, 5]),
-        Supplier(name="gh", address="new york", products=[6, 7])
-        ]
+        suppliers = SupplierFactory.create_batch(3)
         for supplier in suppliers:
             supplier.create()
         logging.debug(suppliers)
@@ -188,11 +185,7 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_find_or_404_found(self):
         """Find or return 404 found"""
-        suppliers = [
-        Supplier(name="abc", email="abc@gmail.com", products=[1, 2, 3]),
-        Supplier(name="def", email="def@gmail.com", address="nyu", products=[4, 5]),
-        Supplier(name="gh", address="new york", products=[6, 7])
-        ]
+        suppliers = SupplierFactory.create_batch(3)
         for supplier in suppliers:
             supplier.create()
         logging.debug(suppliers)
