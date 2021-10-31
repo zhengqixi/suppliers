@@ -12,6 +12,7 @@ from service.supplier_exception \
     import MissingInfo, WrongArgType, \
     UserDefinedIdError, OutOfRange
 
+
 db = SQLAlchemy()
 logger = logging.getLogger("flask.app")
 
@@ -122,7 +123,7 @@ class Supplier(db.Model):
             data (str): A json-formatted string
         """
         if not isinstance(data, str):
-            raise WrongArgType("<class 'dict'> expected for data, "
+            raise WrongArgType("<class 'str'> expected for data, "
                                "got %s" % type(data))
         dictionary = json.loads(data)
         return Supplier.deserialize_from_dict(dictionary)

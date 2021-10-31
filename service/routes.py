@@ -1,17 +1,17 @@
 import os
 import logging
 from typing import Tuple
-from flask import jsonify, Response, request
-from service.supplier import Supplier
-from service.supplier_exception import WrongArgType, MissingInfo
-from . import app
+from flask import jsonify, Response, request, make_response
+from werkzeug.exceptions import abort
+
+from service import error_handlers, status, supplier, app
 
 ######################################################################
 # Get bindings from the environment
 ######################################################################
+
 DEBUG = os.getenv("DEBUG", "False") == "True"
 PORT = os.getenv("PORT", "5000")
-
 
 ######################################################################
 # Create Flask application
@@ -25,49 +25,32 @@ else:
 ######################################################################
 # Application Routes
 ######################################################################
-# @app.route("/")
-# def index() -> Tuple[Response, int]:
-#     """ Returns a message about the service """
-#     app.logger.info("Request for Index page")
-#     return (
-#         jsonify(
-#             name="Supplier"
-#         ),
-#         200,
-#     )
+@app.route("/")
+def index() -> Tuple[Response, int]:
+    """ Returns a message about the service """
+    app.logger.info("Request for Index page")
+    message = "Hello World from Supplier team"
+    return make_response(jsonify(name=message),status.HTTP_200_OK)
 
 
-# @app.route("/supplier", methods=["PUT"])
-# def create_supplier() -> Tuple[Response, int]:
-#     """ Creates a supplier and returns the ID """
-#     request_body = request.json
-#     app.logger.info("request body: {}".format(request_body))
-#     if request_body is None:
-#         app.logger.info("bad request")
-#         return error_response("no request body", 400)
-#     if "name" not in request_body:
-#         return error_response("missing name", 400)
-#     new_name = request_body["name"]
-#     if "email" in request_body:
-#         email = request_body["email"]
-#     else:
-#         email = ""
-#     if "address" in request_body:
-#         address = request_body["address"]
-#     else:
-#         address = ""
-#     try:
-#         new_supplier = Supplier(
-#             name=new_name,
-#             email=email,
-#             address=address
-#         )
-#         created_supplier = database.create_supplier(new_supplier)
-#         app.logger.info(
-#             "created new supplier with id {}".format(created_supplier.id))
-#     except (MissingContactInfo, WrongArgType) as e:
-#         return error_response(str(e), 400)
-#     return jsonify(id=created_supplier.id), 200
+@app.route("/suppliers", methods=["POST"])
+def create_supplier() -> Tuple[Response, int]:
+    """ Creates a supplier and returns the supplier as a dict """
+
+    check_content_type_is_json()
+    request_body = request.json
+    app.logger.info("request body: {}".format(request_body))
+
+    if "name" not in request_body:
+        return error_handlers.bad_request("missing name")
+
+    new_supplier = supplier.Supplier.deserialize_from_dict(request_body)
+    new_supplier.create()
+    message = new_supplier.serialize_to_dict()
+
+    app.logger.info("created new supplier with id {}".format(new_supplier.id))
+
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
 
 # ######################################################################
 # #   Convenience functions
@@ -79,10 +62,24 @@ else:
 #         error=msg
 #     ), error_code
 
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
 
-# ######################################################################
-# #   M A I N
-# ######################################################################
+def check_content_type_is_json():
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == "application/json":
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format("application/json"),
+    )
+
+######################################################################
+#   M A I N
+######################################################################
 # if __name__ == "__main__":
 #     app.logger.info("*" * 70)
 #     app.logger.info("   Seleton Flask For Supplier   ".center(70, "*"))
