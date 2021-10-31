@@ -140,3 +140,32 @@ class TestSupplierServer(unittest.TestCase):
         """Create a Supplier with no content type"""
         resp = self.app.post(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+ 
+    def test_get_supplier(self):
+        """Get a single Supplier"""
+        # first create a new Supplier
+        test_supplier = Supplier(name="abc", 
+            email="abc@gmail.com",
+            address="New York",
+            products=[1, 2, 3])
+        logging.debug(test_supplier)
+        resp_created = self.app.post(
+            BASE_URL, json=test_supplier.serialize_to_dict(), content_type=CONTENT_TYPE_JSON
+        )
+        test_supplier.id = resp_created.get_json()["id"]
+        # read the Supplier based on id
+        resp = self.app.get(
+            "/suppliers/{}".format(test_supplier.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], test_supplier.name, "Name does not match")
+        self.assertEqual(data["email"], test_supplier.email, "Email does not match")
+        self.assertEqual(data["address"], test_supplier.address, "Address does not match")
+        self.assertEqual(data["products"], test_supplier.products, "Products does not match")
+
+    def test_get_supplier_not_found(self):
+        """Get a Supplier thats not found"""
+        resp = self.app.get("/suppliers/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
