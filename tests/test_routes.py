@@ -46,6 +46,7 @@ from flask_sqlalchemy import SQLAlchemy
 from service import status  # HTTP Status Codes
 from service.supplier import db, init_db, Supplier
 from service.routes import app
+from .factories import SupplierFactory
 
 # Disable all but ciritcal errors during normal test run
 # uncomment for debugging failing tests
@@ -88,6 +89,26 @@ class TestSupplierServer(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+    ######################################################################
+    #  T E S T   C A S E S
+    ######################################################################
+    def _create_suppliers(self, count):
+        """Factory method to create suppliers in bulk"""
+        suppliers = []
+        for _ in range(count):
+            test_supplier = SupplierFactory()
+            resp = self.app.post(
+                BASE_URL, json=test_supplier.serialize_to_dict(), 
+                content_type=CONTENT_TYPE_JSON
+            )
+            self.assertEqual(
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test supplier"
+            )
+            new_supplier = resp.get_json()
+            test_supplier.id = new_supplier["id"]
+            suppliers.append(test_supplier)
+        return suppliers
 
     def test_index(self):
         """Test the Home Page"""
@@ -140,19 +161,11 @@ class TestSupplierServer(unittest.TestCase):
         """Create a Supplier with no content type"""
         resp = self.app.post(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
- 
+
     def test_get_supplier(self):
         """Get a single Supplier"""
         # first create a new Supplier
-        test_supplier = Supplier(name="abc", 
-            email="abc@gmail.com",
-            address="New York",
-            products=[1, 2, 3])
-        logging.debug(test_supplier)
-        resp_created = self.app.post(
-            BASE_URL, json=test_supplier.serialize_to_dict(), content_type=CONTENT_TYPE_JSON
-        )
-        test_supplier.id = resp_created.get_json()["id"]
+        test_supplier = self._create_suppliers(1)[0]
         # read the Supplier based on id
         resp = self.app.get(
             "/suppliers/{}".format(test_supplier.id), content_type=CONTENT_TYPE_JSON
