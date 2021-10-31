@@ -1,10 +1,23 @@
+"""
+Supplier Store Service
+
+Paths:
+------
+GET /suppliers - Returns a list all of the Suppliers
+GET /suppliers/{id} - Returns the Supplier with a given id number
+POST /suppliers - creates a new Supplier record in the database
+PUT /suppliers/{id} - updates a Supplier record in the database
+DELETE /suppliers/{id} - deletes a Supplier record in the database
+"""
+
 import os
 import logging
 from typing import Tuple
 from flask import jsonify, Response, request, make_response
-from werkzeug.exceptions import abort
+from werkzeug.exceptions import abort, NotFound
 
 from service import error_handlers, status, supplier, app
+from service.supplier import Supplier
 
 ######################################################################
 # Get bindings from the environment
@@ -51,6 +64,18 @@ def create_supplier() -> Tuple[Response, int]:
     app.logger.info("created new supplier with id {}".format(new_supplier.id))
 
     return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+
+@app.route("/suppliers/<int:supplier_id>", methods=["GET"])
+def get_supplier(supplier_id) -> Tuple[Response, int]:
+    """ Reads a supplier and returns the supplier as a dict """
+    app.logger.info('Reads a supplier with id: {}'.format(supplier_id))
+    supplier = Supplier.find(supplier_id)
+    if not supplier:
+        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+    app.logger.info("Returning supplier: %s", supplier.name)
+    message = supplier.serialize_to_dict()
+    return make_response(jsonify(message), status.HTTP_200_OK)
 
 # ######################################################################
 # #   Convenience functions
