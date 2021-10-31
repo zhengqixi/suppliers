@@ -102,7 +102,7 @@ class Supplier(db.Model):
         return cls.query.get(supplier_id)
 
     @classmethod
-    def find_or_404(cls, pet_id:int):
+    def find_or_404(cls, supplier_id:int):
         """Find a Supplier by it's id
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
