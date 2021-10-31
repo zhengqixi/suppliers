@@ -8,6 +8,7 @@ While debugging just these tests it's convinient to use this:
 """
 import os
 import unittest
+from werkzeug.exceptions import NotFound
 from service.supplier import Supplier, db
 from service import app
 import logging
@@ -164,3 +165,48 @@ class TestSupplierModel(unittest.TestCase):
         self.assertEqual(supplier.id, 2)
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
+
+    def test_find_supplier(self):
+        """Find a Supplier by ID"""
+        suppliers = [
+        Supplier(name="abc", email="abc@gmail.com", products=[1, 2, 3]),
+        Supplier(name="def", email="def@gmail.com", address="nyu", products=[4, 5]),
+        Supplier(name="gh", address="new york", products=[6, 7])
+        ]
+        for supplier in suppliers:
+            supplier.create()
+        logging.debug(suppliers)
+        # make sure they got saved
+        self.assertEqual(len(Supplier.all()), 3)
+        # find the 2nd supplier in the list
+        supplier = Supplier.find(suppliers[1].id)
+        self.assertIsNot(supplier, None)
+        self.assertEqual(supplier.id, suppliers[1].id)
+        self.assertEqual(supplier.name, suppliers[1].name)
+        self.assertEqual(supplier.email, supplier[1].email)
+        self.assertEqual(supplier.products, supplier[1].products)
+
+    def test_find_or_404_found(self):
+        """Find or return 404 found"""
+        suppliers = [
+        Supplier(name="abc", email="abc@gmail.com", products=[1, 2, 3]),
+        Supplier(name="def", email="def@gmail.com", address="nyu", products=[4, 5]),
+        Supplier(name="gh", address="new york", products=[6, 7])
+        ]
+        for supplier in suppliers:
+            supplier.create()
+        logging.debug(suppliers)
+        # make sure they got saved
+        self.assertEqual(len(Supplier.all()), 3)
+        # find the 2nd supplier in the list
+        supplier = Supplier.find_or_404(suppliers[1].id)
+        self.assertIsNot(supplier, None)
+        self.assertEqual(supplier.id, suppliers[1].id)
+        self.assertEqual(supplier.name, suppliers[1].name)
+        self.assertEqual(supplier.email, supplier[1].email)
+        self.assertEqual(supplier.products, supplier[1].products)
+
+    def test_find_or_404_not_found(self):
+        """Find or return 404 NOT found"""
+        self.assertRaises(NotFound, Supplier.find_or_404, 0)
+
