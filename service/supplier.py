@@ -91,7 +91,7 @@ class Supplier(db.Model):
         return cls.query.all()
     
     @classmethod
-    def find(cls, supplier_id:int):
+    def find(cls, supplier_id: int) -> 'Supplier':
         """Finds a Supplier by it's ID
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
@@ -102,7 +102,7 @@ class Supplier(db.Model):
         return cls.query.get(supplier_id)
 
     @classmethod
-    def find_or_404(cls, supplier_id:int):
+    def find_or_404(cls, supplier_id: int) -> 'Supplier':
         """Find a Supplier by it's id
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
