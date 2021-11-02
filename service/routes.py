@@ -18,6 +18,7 @@ from werkzeug.exceptions import abort, NotFound, BadRequest
 from service import error_handlers, status, supplier, app
 from service.supplier import Supplier
 
+from . import status, app
 
 
 ######################################################################
