@@ -95,17 +95,6 @@ class Supplier(db.Model):
         """Finds a Supplier by it's ID
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
-        :return: an instance with the supplier_id, or None if not found
-        :rtype: Supplier
-        """
-        logger.info("Processing lookup for id %s ...", supplier_id)
-        return cls.query.get(supplier_id)
-
-    @classmethod
-    def find_or_404(cls, supplier_id: int) -> 'Supplier':
-        """Find a Supplier by it's id
-        :param supplier_id: the id of the Supplier to find
-        :type supplier_id: int
         :return: an instance with the supplier_id, or 404_NOT_FOUND if not found
         :rtype: Supplier
         """
