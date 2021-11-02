@@ -170,8 +170,8 @@ class Supplier(db.Model):
                               "(email or address) is required")
         db.session.commit()
         return self
-    
-    def add_products(self, products: Union[List[int],Set[int]]) -> "Supplier":
+
+    def add_products(self, products: Union[List[int], Set[int]]) -> "Supplier":
         """
         Adds the list of suppliers to self and commits to database.
         Returns self
@@ -181,7 +181,8 @@ class Supplier(db.Model):
         duplicates = set(current_products).intersection(set(products))
 
         if len(duplicates) != 0:
-            raise DuplicateProduct("Duplicated products: {}".format(duplicates))
+            raise DuplicateProduct(
+                "Duplicated products: {}".format(duplicates))
 
         new_products = list(current_products) + list(products)
         return self.update({

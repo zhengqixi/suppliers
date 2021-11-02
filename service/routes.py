@@ -77,6 +77,7 @@ def update_supplier(supplier_id: int) -> Tuple[Response, int]:
 
     return make_response(jsonify(message), status.HTTP_200_OK)
 
+
 @app.route("/suppliers/<int:supplier_id>/products", methods=["POST"])
 def add_product(supplier_id: int) -> Tuple[Response, int]:
     """

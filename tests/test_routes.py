@@ -202,7 +202,7 @@ class TestSupplierServer(unittest.TestCase):
             "{}/{}".format(BASE_URL, 0), json=test_supplier, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_add_product_to_supplier_happy_path(self):
         """ Tests that adding a product to a supplier works """
 
@@ -278,7 +278,6 @@ class TestSupplierServer(unittest.TestCase):
             "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
 
     def test_add_product_to_supplier_does_not_exist(self):
         """ Tests that adding to a non-existent supplier fails"""
