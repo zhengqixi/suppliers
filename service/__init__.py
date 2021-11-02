@@ -7,12 +7,14 @@ and SQL database
 import sys
 import logging
 from flask import Flask
-# Import the rutes After the Flask app is created
 from . import supplier
 
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object("config")
+
+# Import the routes After the Flask app is created
+from service import routes, error_handlers
 
 # Set up logging for production
 print("Setting up logging for {}...".format(__name__))

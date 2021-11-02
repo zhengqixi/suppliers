@@ -21,3 +21,7 @@ class OutOfRange(SupplierException):
 class UserDefinedIdError(SupplierException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+class DuplicateProduct(SupplierException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

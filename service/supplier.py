@@ -9,7 +9,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
 from service.supplier_exception \
-    import MissingInfo, WrongArgType, \
+    import DuplicateProduct, MissingInfo, WrongArgType, \
     UserDefinedIdError, OutOfRange
 
 
@@ -165,7 +165,28 @@ class Supplier(db.Model):
         self.email = data["email"] if "email" in data else self.email
         self.address = data["address"] if "address" in data else self.address
         self.products = data["products"] if "products" in data else self.products
+        if self.email is None and self.address is None:
+            raise MissingInfo("At least one contact method "
+                              "(email or address) is required")
         db.session.commit()
+        return self
+    
+    def add_products(self, products: Union[List[int],Set[int]]) -> "Supplier":
+        """
+        Adds the list of suppliers to self and commits to database.
+        Returns self
+        """
+        self._check_product_ids(products)
+        current_products = self.products or []
+        duplicates = set(current_products).intersection(set(products))
+
+        if len(duplicates) != 0:
+            raise DuplicateProduct("Duplicated products: {}".format(duplicates))
+
+        new_products = list(current_products) + list(products)
+        return self.update({
+            "products": new_products
+        })
 
     def serialize_to_dict(self) -> dict:
         """Serializes a supplier into a dictionary"""

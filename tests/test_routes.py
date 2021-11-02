@@ -146,10 +146,10 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_supplier_invalid_arguments(self):
-        """ Create a Supplier with a user supplied id """
+        """ Create a Supplier with a user supplied id and invalid address """
         test_supplier = {
             "email": "test@nyu.edu",
-            "address": "omg",
+            "address": 177013,
             "id": 2
         }
         logging.debug(test_supplier)
@@ -200,5 +200,95 @@ class TestSupplierServer(unittest.TestCase):
         logging.debug(test_supplier)
         resp = self.app.put(
             "{}/{}".format(BASE_URL, 0), json=test_supplier, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_add_product_to_supplier_happy_path(self):
+        """ Tests that adding a product to a supplier works """
+
+        # Create supplier
+        test_supplier = {
+            "name": "TOM",
+            "email": "a0",
+            "address": "asd",
+            "products": [102, 123],
+        }
+        logging.debug(test_supplier)
+        resp = self.app.post(
+            BASE_URL, json=test_supplier, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        to_add_products = {
+            "products": [145, 1776]
+        }
+
+        # Add to the products list using the action endpoint
+        resp = self.app.post(
+            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        body = resp.json
+        self.assertEqual(body["products"], [102, 123, 145, 1776])
+
+    def test_add_product_to_supplier_duplicate_products_should_fail(self):
+        """ Tests that adding a duplicate product to a supplier fails"""
+
+        # Create supplier
+        test_supplier = {
+            "name": "TOM",
+            "email": "a0",
+            "address": "asd",
+            "products": [102, 123],
+        }
+        logging.debug(test_supplier)
+        resp = self.app.post(
+            BASE_URL, json=test_supplier, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        to_add_products = {
+            "products": [145, 123]
+        }
+
+        # Add to the products list using the action endpoint
+        resp = self.app.post(
+            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_add_product_to_supplier_no_products(self):
+        """ Tests that adding an empty product fails"""
+
+        # Create supplier
+        test_supplier = {
+            "name": "TOM",
+            "email": "a0",
+            "address": "asd",
+            "products": [102, 123],
+        }
+        logging.debug(test_supplier)
+        resp = self.app.post(
+            BASE_URL, json=test_supplier, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        to_add_products = {
+        }
+
+        # Add to the products list using the action endpoint
+        resp = self.app.post(
+            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_add_product_to_supplier_does_not_exist(self):
+        """ Tests that adding to a non-existent supplier fails"""
+
+        to_add_products = {
+            "products": [145, 123]
+        }
+
+        # Add to the products list using the action endpoint
+        resp = self.app.post(
+            "{}/{}/product".format(BASE_URL, 0), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
