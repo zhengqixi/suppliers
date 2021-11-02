@@ -224,7 +224,7 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         body = resp.json
@@ -251,7 +251,7 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -275,7 +275,7 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/product".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -289,6 +289,6 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/product".format(BASE_URL, 0), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, 0), json=to_add_products, content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
