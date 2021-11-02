@@ -183,23 +183,7 @@ class TestSupplierModel(unittest.TestCase):
         self.assertEqual(supplier.email, suppliers[1].email)
         self.assertEqual(supplier.products, suppliers[1].products)
 
-    def test_find_or_404_found(self):
-        """Find or return 404 found"""
-        suppliers = SupplierFactory.create_batch(3)
-        for supplier in suppliers:
-            supplier.create()
-        logging.debug(suppliers)
-        # make sure they got saved
-        self.assertEqual(len(Supplier.all()), 3)
-        # find the 2nd supplier in the list
-        supplier = Supplier.find_or_404(suppliers[1].id)
-        self.assertIsNot(supplier, None)
-        self.assertEqual(supplier.id, suppliers[1].id)
-        self.assertEqual(supplier.name, suppliers[1].name)
-        self.assertEqual(supplier.email, suppliers[1].email)
-        self.assertEqual(supplier.products, suppliers[1].products)
-
-    def test_find_or_404_not_found(self):
+    def test_find_not_found(self):
         """Find or return 404 NOT found"""
-        self.assertRaises(NotFound, Supplier.find_or_404, 0)
+        self.assertRaises(NotFound, Supplier.find, 0)
 
