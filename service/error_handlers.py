@@ -1,12 +1,11 @@
 from flask import jsonify
 from . import app, status
-from service.supplier_exception import SupplierException
+# from service.supplier_exception import SupplierException
 
-
-@app.errorhandler(SupplierException)
-def supplier_exception(error):
-    """ Handles supplier exceptions as bad requests """
-    return bad_request(error)
+# @app.errorhandler(SupplierException)
+# def supplier_exception(error):
+#    """ Handles supplier exceptions as bad requests """
+#    return bad_request(error)
 
 
 ######################################################################
