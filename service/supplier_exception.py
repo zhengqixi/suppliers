@@ -1,18 +1,23 @@
-class MissingInfo(Exception):
+class SupplierException(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
 
-class WrongArgType(Exception):
+class MissingInfo(SupplierException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
 
-class OutOfRange(Exception):
+class WrongArgType(SupplierException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
 
-class UserDefinedIdError(Exception):
+class OutOfRange(SupplierException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+class UserDefinedIdError(SupplierException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)

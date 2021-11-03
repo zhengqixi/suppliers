@@ -12,6 +12,7 @@ from werkzeug.exceptions import NotFound
 from service.supplier import Supplier, db
 from .factories import SupplierFactory
 from service import app
+from werkzeug.exceptions import NotFound
 import logging
 from service.supplier_exception \
     import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError
@@ -187,3 +188,19 @@ class TestSupplierModel(unittest.TestCase):
         """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Supplier.find, 0)
 
+    def test_update_supplier(self):
+        """
+        Creates a Supplier
+        Update the supplier
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        supplier.update({
+            "name": "Super Ken",
+            "address": "super ken home"
+        })
+        updated_supplier = Supplier.find(supplier.id)
+        self.assertEqual(updated_supplier.name, "Super Ken")
+        self.assertEqual(updated_supplier.address, "super ken home")
+        self.assertEqual(updated_supplier.email, "Ken@gmail.com")

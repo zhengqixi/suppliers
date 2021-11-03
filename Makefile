@@ -1,5 +1,5 @@
 run:
-	python app.py
+	FLASK_APP=service:app flask run -h 0.0.0.0
 
 debug:
-	export DEBUG="True" && python app.py
+	export FLASK_ENV="development" && FLASK_APP=service:app flask run -h 0.0.0.0
