@@ -91,7 +91,7 @@ class Supplier(db.Model):
         return cls.query.all()
     
     @classmethod
-    def find(cls, supplier_id: int) -> 'Supplier':
+    def find(cls, supplier_id: int) -> "Supplier":
         """Finds a Supplier by it's ID
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
@@ -101,13 +101,6 @@ class Supplier(db.Model):
         logger.info("Processing lookup or 404 for id %s ...", supplier_id)
         return cls.query.get_or_404(supplier_id)
 
-    @classmethod
-    def find(cls, supplier_id: int) -> "Supplier":
-        """ 
-        Finds a supplier with the provided int
-        Throws NotFound if none is found
-        """
-        return cls.query.get_or_404(supplier_id)
 
     ##################################################
     # STATIC METHODS
