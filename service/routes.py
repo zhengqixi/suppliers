@@ -71,8 +71,6 @@ def get_supplier(supplier_id) -> Tuple[Response, int]:
     """ Reads a supplier and returns the supplier as a dict """
     app.logger.info('Reads a supplier with id: {}'.format(supplier_id))
     supplier = Supplier.find(supplier_id)
-    if not supplier:
-        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
     app.logger.info("Returning supplier: %s", supplier.name)
     message = supplier.serialize_to_dict()
     return make_response(jsonify(message), status.HTTP_200_OK)
