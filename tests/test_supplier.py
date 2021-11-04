@@ -8,7 +8,9 @@ While debugging just these tests it's convinient to use this:
 """
 import os
 import unittest
+from werkzeug.exceptions import NotFound
 from service.supplier import Supplier, db
+from .factories import SupplierFactory
 from service import app
 from werkzeug.exceptions import NotFound
 import logging
@@ -166,21 +168,24 @@ class TestSupplierModel(unittest.TestCase):
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
 
-    def test_find_supplier_exists(self):
-        """
-        Creates a supplier and asserts that we can find it
-        """
-        supplier = Supplier(name="Ken",
-                            email="Ken@gmail.com", products=set([2, 4]))
-        supplier.create()
-        found_supplier = Supplier.find(supplier.id)
-        self.assertEqual(supplier, found_supplier)
+    def test_find_supplier(self):
+        """Find a Supplier by ID"""
+        suppliers = SupplierFactory.create_batch(3)
+        for supplier in suppliers:
+            supplier.create()
+        logging.debug(suppliers)
+        # make sure they got saved
+        self.assertEqual(len(Supplier.all()), 3)
+        # find the 2nd supplier in the list
+        supplier = Supplier.find(suppliers[1].id)
+        self.assertIsNot(supplier, None)
+        self.assertEqual(supplier.id, suppliers[1].id)
+        self.assertEqual(supplier.name, suppliers[1].name)
+        self.assertEqual(supplier.email, suppliers[1].email)
+        self.assertEqual(supplier.products, suppliers[1].products)
 
-    def test_find_supplier_does_not_exist(self):
-        """
-        Looks for a non-existent supplier. 
-        Asserts that NotFound is raised
-        """
+    def test_find_not_found(self):
+        """Find or return 404 NOT found"""
         self.assertRaises(NotFound, Supplier.find, 0)
 
     def test_update_supplier(self):
