@@ -150,6 +150,7 @@ class TestSupplierServer(unittest.TestCase):
         test_supplier = {
             "email": "test@nyu.edu",
             "address": 177013,
+            "name": "omg",
             "id": 2
         }
         logging.debug(test_supplier)
