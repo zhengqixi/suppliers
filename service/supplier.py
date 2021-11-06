@@ -8,6 +8,7 @@ from typing import List, Set, Union
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
+from werkzeug.exceptions import NotFound
 from service.supplier_exception \
     import DuplicateProduct, MissingInfo, WrongArgType, \
     UserDefinedIdError, OutOfRange
@@ -49,15 +50,14 @@ class Supplier(db.Model):
         self._check_address(self.address)
         self._check_product_ids(self.products)
 
-        if isinstance(self.products, Set):
-            self.products = list(self.products)
+        self.products = sorted(set(self.products))
 
         if self.email is None and self.address is None:
             raise MissingInfo("At least one contact method "
                               "(email or address) is required")
 
-    def __repr__(self):
-        return "<Supplier %r, id=%s>" % (self.name, self.id)
+    # def __repr__(self):
+    #     return "<Supplier %r, id=%s>" % (self.name, self.id)
 
     def __eq__(self, other):
         if not isinstance(other, Supplier):
@@ -89,18 +89,44 @@ class Supplier(db.Model):
         """Returns all of the suppliers in the database"""
         logger.info("Processing all suppliers")
         return cls.query.all()
-    
+
     @classmethod
-    def find(cls, supplier_id: int) -> "Supplier":
+    def find_all(cls, supplier_info: dict) -> "Supplier":
+        """Finds Suppliers by given attributes
+        :param supplier_info: given attributes to find suppliers
+        :type supplier_info: dict
+        :return: a list of suppliers,
+                 or 404_NOT_FOUND if not found
+        :rtype: List
+        """
+        if isinstance(supplier_info, int):
+            supplier_info = {'id': supplier_info}
+        useless_info = []
+        for k, v in supplier_info.items():
+            if v is None:
+                useless_info.append(k)
+            elif k == 'products':
+                supplier_info[k] = sorted(supplier_info[k])
+        for k in useless_info:
+            supplier_info.pop(k)
+        # logger.info("Processing lookup or 404 for id %s ...",
+        #             supplier_info['id'])  # may not have ID,
+        #                                   # need other way to log
+        ret = Supplier.query.filter_by(**supplier_info).all()
+        if len(ret) == 0:
+            raise NotFound
+        return ret
+
+    @classmethod
+    def find_first(cls, supplier_info: dict) -> "Supplier":
         """Finds a Supplier by it's ID
         :param supplier_id: the id of the Supplier to find
         :type supplier_id: int
-        :return: an instance with the supplier_id, or 404_NOT_FOUND if not found
+        :return: an instance with the supplier_id,
+                 or 404_NOT_FOUND if not found
         :rtype: Supplier
         """
-        logger.info("Processing lookup or 404 for id %s ...", supplier_id)
-        return cls.query.get_or_404(supplier_id)
-
+        return Supplier.find_all(supplier_info)[0]
 
     ##################################################
     # STATIC METHODS
@@ -160,11 +186,19 @@ class Supplier(db.Model):
         Updates self with data in dict
         Saves changes to the database
         """
-        self.id = data["id"] if "id" in data else self.id
         self.name = data["name"] if "name" in data else self.name
         self.email = data["email"] if "email" in data else self.email
         self.address = data["address"] if "address" in data else self.address
-        self.products = data["products"] if "products" in data else self.products
+        self.products = data["products"] if "products" in data\
+                                            else self.products
+
+        self._check_name(self.name)
+        self._check_email(self.email)
+        self._check_address(self.address)
+        self._check_product_ids(self.products)
+
+        self.products = sorted(set(self.products))
+
         if self.email is None and self.address is None:
             raise MissingInfo("At least one contact method "
                               "(email or address) is required")
@@ -242,6 +276,8 @@ class Supplier(db.Model):
         '''check the type of product ids'''
         if product_ids is None:
             product_ids = []
+            self.products = product_ids
+            return
         elif not isinstance(product_ids, (List, Set)):
             raise WrongArgType("class<'List'> or class<'Set'> expected "
                                "for product ids, got %s" % type(product_ids))
