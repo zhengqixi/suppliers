@@ -15,7 +15,7 @@ from service import app
 from werkzeug.exceptions import NotFound
 import logging
 from service.supplier_exception \
-    import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError
+    import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError, DuplicateProduct
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
@@ -190,8 +190,7 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_update_supplier(self):
         """
-        Creates a Supplier
-        Update the supplier
+        Creates a Supplier and Update the supplier
         """
         supplier = Supplier(name="Ken",
                             email="Ken@gmail.com", products=set([2, 4]))
@@ -204,3 +203,50 @@ class TestSupplierModel(unittest.TestCase):
         self.assertEqual(updated_supplier.name, "Super Ken")
         self.assertEqual(updated_supplier.address, "super ken home")
         self.assertEqual(updated_supplier.email, "Ken@gmail.com")
+
+    def test_update_supplier_missing_email(self):
+        """
+        Update the supplier with missing data should raise exception
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        update_json = {
+            "name": "Super Ken",
+            "email": None
+        }
+        self.assertRaises(MissingInfo, supplier.update, update_json)
+
+    def test_add_product(self):
+        """
+        Create a supplier and add to the product list 
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        supplier.add_products([1, 3])
+        updated_supplier = Supplier.find(supplier.id)
+        self.assertEqual(updated_supplier.products, [2, 4, 1, 3])
+        supplier.add_products(set([5, 6]))
+        updated_supplier = Supplier.find(supplier.id)
+        self.assertEqual(updated_supplier.products, [2, 4, 1, 3, 5, 6])
+
+    def test_add_product_duplicate(self):
+        """
+        Create a supplier and add duplicate products. Assert DuplicateProduct is raised
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+        self.assertRaises(DuplicateProduct, supplier.add_products, [2, 4])
+
+    def test_add_product_none_existed(self):
+        """
+        Create a supplier without any products and add to it
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com")
+        supplier.create()
+        supplier.add_products([1, 3])
+        updated_supplier = Supplier.find(supplier.id)
+        self.assertEqual(updated_supplier.products, [1, 3])

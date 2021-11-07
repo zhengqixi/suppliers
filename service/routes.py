@@ -10,29 +10,12 @@ PUT /suppliers/{id} - updates a Supplier record in the database
 DELETE /suppliers/{id} - deletes a Supplier record in the database
 """
 
-import os
-import logging
 from typing import Tuple
 from flask import jsonify, Response, request, make_response
-from werkzeug.exceptions import abort, NotFound, BadRequest
-from service import error_handlers, status, supplier, app
+from werkzeug.exceptions import abort, BadRequest
 from service.supplier import Supplier
 
-
-######################################################################
-# Get bindings from the environment
-######################################################################
-
-DEBUG = os.getenv("DEBUG", "False") == "True"
-PORT = os.getenv("PORT", "5000")
-
-######################################################################
-# Create Flask application
-######################################################################
-if DEBUG:
-    app.logger.setLevel(logging.DEBUG)
-else:
-    app.logger.setLevel(logging.INFO)
+from . import status, app
 
 
 ######################################################################
@@ -91,6 +74,25 @@ def update_supplier(supplier_id: int) -> Tuple[Response, int]:
     message = supplier.serialize_to_dict()
 
     return make_response(jsonify(message), status.HTTP_200_OK)
+
+
+@app.route("/suppliers/<int:supplier_id>/products", methods=["POST"])
+def add_product(supplier_id: int) -> Tuple[Response, int]:
+    """
+    Adds the provided list of products to a supplier
+    Returns the updated supplier
+    """
+    check_content_type_is_json()
+    request_body = request.json
+    app.logger.info("request body: {}".format(request_body))
+
+    supplier = Supplier.find(supplier_id)
+    try:
+        supplier.add_products(request_body["products"])
+        message = supplier.serialize_to_dict()
+        return make_response(jsonify(message), status.HTTP_200_OK)
+    except KeyError:
+        raise BadRequest("products not provided")
 
 
 ######################################################################
