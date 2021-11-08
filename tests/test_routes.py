@@ -243,16 +243,25 @@ class TestSupplierServer(unittest.TestCase):
                          sorted(test_supplier['products']),
                          "Products does not match")
 
-    def test_get_multiple_suppliers_invalid_attributes(self):
-        """Get multiple suppliers with invalid attributes"""
+    def test_get_all_suppliers(self):
+        """Get all suppliers"""
+        self._create_suppliers(3)
+        resp = self.app.get("/suppliers")
+        data = resp.get_json()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 3)
+
+    def test_all_suppliers_even_with_invalid_attributes(self):
+        """Get all suppliers even with invalid attributes"""
         self._create_suppliers(3)
         resp = self.app.get("/suppliers?country=inatsuma")
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        data = resp.get_json()
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(data), 3)
 
     def test_get_multiple_suppliers_not_existed_attributes(self):
         """Get multiple suppliers with not exited attributes"""
         self._create_suppliers(3)
-
         resp = self.app.get("/suppliers?products=1,2,3&name=Hutao")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -277,7 +286,9 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]),
+            json=to_add_products,
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         body = resp.json
@@ -304,7 +315,9 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]),
+            json=to_add_products,
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -328,7 +341,9 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/products".format(BASE_URL, resp.json["id"]), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, resp.json["id"]),
+            json=to_add_products,
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -341,6 +356,8 @@ class TestSupplierServer(unittest.TestCase):
 
         # Add to the products list using the action endpoint
         resp = self.app.post(
-            "{}/{}/products".format(BASE_URL, 0), json=to_add_products, content_type=CONTENT_TYPE_JSON
+            "{}/{}/products".format(BASE_URL, 0),
+            json=to_add_products,
+            content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

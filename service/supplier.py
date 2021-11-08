@@ -91,13 +91,18 @@ class Supplier(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find_all(cls, supplier_info: dict) -> "Supplier":
-        """Finds Suppliers by given attributes
-        :param supplier_info: given attributes to find suppliers
-        :type supplier_info: dict
-        :return: a list of suppliers,
+    def list(cls) -> List["Supplier"]:
+        """List all suppliers"""
+        return Supplier.query.all()
+
+    @classmethod
+    def find_all(cls, supplier_info: dict) -> List["Supplier"]:
+        """Finds a Supplier by it's ID
+        :param supplier_id: the id of the Supplier to find
+        :type supplier_id: int
+        :return: an instance with the supplier_id,
                  or 404_NOT_FOUND if not found
-        :rtype: List
+        :rtype: Supplier
         """
         if isinstance(supplier_info, int):
             supplier_info = {'id': supplier_info}

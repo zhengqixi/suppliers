@@ -14,7 +14,8 @@ from .factories import SupplierFactory
 from service import app
 import logging
 from service.supplier_exception \
-    import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError, DuplicateProduct
+    import MissingInfo, OutOfRange, WrongArgType,\
+    UserDefinedIdError, DuplicateProduct
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
@@ -217,7 +218,7 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_add_product(self):
         """
-        Create a supplier and add to the product list 
+        Create a supplier and add to the product list
         """
         supplier = Supplier(name="Ken",
                             email="Ken@gmail.com", products=set([2, 4]))
@@ -231,7 +232,8 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_add_product_duplicate(self):
         """
-        Create a supplier and add duplicate products. Assert DuplicateProduct is raised
+        Create a supplier and add duplicate products.
+        Assert DuplicateProduct is raised
         """
         supplier = Supplier(name="Ken",
                             email="Ken@gmail.com", products=set([2, 4]))
@@ -246,5 +248,5 @@ class TestSupplierModel(unittest.TestCase):
                             email="Ken@gmail.com")
         supplier.create()
         supplier.add_products([1, 3])
-        updated_supplier = Supplier.find_first({'id': supplier.id})
+        updated_supplier = Supplier.find_first(supplier.id)
         self.assertEqual(updated_supplier.products, [1, 3])
