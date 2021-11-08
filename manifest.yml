@@ -16,3 +16,4 @@ applications:
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false
+    DATABASE_URI : postgres://aplcyqcc:QRk6pnQJsfYwaCGnFf-Pgk8SUdzL5Wck@fanny.db.elephantsql.com/aplcyqcc
