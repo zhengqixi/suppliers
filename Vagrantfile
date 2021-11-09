@@ -110,4 +110,28 @@ Vagrant.configure(2) do |config|
     # Done
   SHELL
 
+  ######################################################################
+  # Setup a Bluemix and Kubernetes environment
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "\n************************************"
+    echo " Installing IBM Cloud CLI..."
+    echo "************************************\n"
+    # Install IBM Cloud CLI as Vagrant user
+    sudo -H -u vagrant sh -c '
+    curl -fsSL https://clis.cloud.ibm.com/install/linux | sh && \
+    ibmcloud cf install && \
+    echo "alias ic=ibmcloud" >> ~/.bashrc
+    '
+    # Show completion instructions
+    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
+    echo "\n************************************"
+    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
+    echo "You can login with the following command:"
+    echo "\n"
+    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apikey.json -r us-south"
+    echo "ibmcloud target --cf"
+    echo "\n************************************"
+  SHELL
+
 end

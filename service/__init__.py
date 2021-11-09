@@ -33,7 +33,7 @@ if __name__ != "__main__":
     app.logger.info("Logging handler established")
 
 app.logger.info(70 * "*")
-app.logger.info("  S U P P L I E R   S T O R E   "
+app.logger.info("  S U P P L I E R   "
                 "S E R V I C E  ".center(70, "*"))
 app.logger.info(70 * "*")
 
