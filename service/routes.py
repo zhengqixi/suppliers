@@ -141,9 +141,9 @@ def delete_supplier(supplier_id: int) -> Tuple[Response, int]:
         supplier = Supplier.find_first(supplier_id)
         supplier.delete()
         app.logger.info("Supplier with id {} has been deleted.".format(supplier_id))
-        return make_response(jsonify({}), status.HTTP_204_NO_CONTENT)
     except NotFound:
         app.logger.info("Supplier with id {} does not exist.".format(supplier_id))
+    finally:
         return make_response(jsonify({}), status.HTTP_204_NO_CONTENT)
 
 
