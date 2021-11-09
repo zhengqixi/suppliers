@@ -250,3 +250,21 @@ class TestSupplierModel(unittest.TestCase):
         supplier.add_products([1, 3])
         updated_supplier = Supplier.find_first(supplier.id)
         self.assertEqual(updated_supplier.products, [1, 3])
+
+    def test_delete_supplier(self):
+        """
+        Creates a Supplier
+        Delete the supplier
+        """
+        supplier = Supplier(name="Ken",
+                            email="Ken@gmail.com", products=set([2, 4]))
+        supplier.create()
+
+        # Test it can be found before deletion
+        supplier_to_be_deleted = Supplier.find_first(supplier.id)
+        self.assertEqual(supplier_to_be_deleted.name, "Ken")
+        self.assertEqual(supplier_to_be_deleted.email, "Ken@gmail.com")
+
+        # Test it cannot be found after deletion
+        supplier.delete()
+        self.assertRaises(NotFound, Supplier.find_first, 0)
