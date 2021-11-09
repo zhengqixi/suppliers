@@ -13,7 +13,7 @@ class SupplierFactory(factory.Factory):
     class Meta:
         model = Supplier
 
-    id = None # factory.Sequence(lambda n: n)
+    id = None  # factory.Sequence(lambda n: n)
     name = factory.Faker("first_name")
     email = str(name) + "@gmail.com"
     address = FuzzyChoice(
