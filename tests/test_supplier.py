@@ -12,10 +12,10 @@ from werkzeug.exceptions import NotFound
 from service.supplier import Supplier, db
 from .factories import SupplierFactory
 from service import app
-from werkzeug.exceptions import NotFound
 import logging
 from service.supplier_exception \
-    import MissingInfo, OutOfRange, WrongArgType, UserDefinedIdError, DuplicateProduct
+    import MissingInfo, OutOfRange, WrongArgType,\
+    UserDefinedIdError, DuplicateProduct
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
@@ -57,7 +57,6 @@ class TestSupplierModel(unittest.TestCase):
     def supplier_repr(self):
         supplier = Supplier(name='foo', address="USA")
         supplier.create()
-        print(supplier)
         self.assertEqual(repr(supplier), "<Supplier foo, id=1>")
 
     def test_construct_a_supplier(self):
@@ -68,7 +67,7 @@ class TestSupplierModel(unittest.TestCase):
         self.assertEqual(supplier.name, "Tom")
         self.assertEqual(supplier.email, "Tom@gmail.com")
         self.assertEqual(supplier.address, None)
-        self.assertEqual(supplier.products, None)
+        self.assertEqual(supplier.products, [])
         supplier = Supplier(name="Apple",
                             email="abc@apple.com",
                             products=[1, 2, 3])
@@ -168,7 +167,7 @@ class TestSupplierModel(unittest.TestCase):
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
 
-    def test_find_supplier(self):
+    def test_find_single_supplier(self):
         """Find a Supplier by ID"""
         suppliers = SupplierFactory.create_batch(3)
         for supplier in suppliers:
@@ -177,7 +176,7 @@ class TestSupplierModel(unittest.TestCase):
         # make sure they got saved
         self.assertEqual(len(Supplier.all()), 3)
         # find the 2nd supplier in the list
-        supplier = Supplier.find(suppliers[1].id)
+        supplier = Supplier.find_first({'id': suppliers[1].id})
         self.assertIsNot(supplier, None)
         self.assertEqual(supplier.id, suppliers[1].id)
         self.assertEqual(supplier.name, suppliers[1].name)
@@ -186,7 +185,7 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_find_not_found(self):
         """Find or return 404 NOT found"""
-        self.assertRaises(NotFound, Supplier.find, 0)
+        self.assertRaises(NotFound, Supplier.find_first, {'id': 0})
 
     def test_update_supplier(self):
         """
@@ -199,7 +198,7 @@ class TestSupplierModel(unittest.TestCase):
             "name": "Super Ken",
             "address": "super ken home"
         })
-        updated_supplier = Supplier.find(supplier.id)
+        updated_supplier = Supplier.find_first({'id': supplier.id})
         self.assertEqual(updated_supplier.name, "Super Ken")
         self.assertEqual(updated_supplier.address, "super ken home")
         self.assertEqual(updated_supplier.email, "Ken@gmail.com")
@@ -219,21 +218,22 @@ class TestSupplierModel(unittest.TestCase):
 
     def test_add_product(self):
         """
-        Create a supplier and add to the product list 
+        Create a supplier and add to the product list
         """
         supplier = Supplier(name="Ken",
                             email="Ken@gmail.com", products=set([2, 4]))
         supplier.create()
         supplier.add_products([1, 3])
-        updated_supplier = Supplier.find(supplier.id)
-        self.assertEqual(updated_supplier.products, [2, 4, 1, 3])
+        updated_supplier = Supplier.find_first({'id': supplier.id})
+        self.assertEqual(updated_supplier.products, sorted([2, 4, 1, 3]))
         supplier.add_products(set([5, 6]))
-        updated_supplier = Supplier.find(supplier.id)
-        self.assertEqual(updated_supplier.products, [2, 4, 1, 3, 5, 6])
+        updated_supplier = Supplier.find_first({'id': supplier.id})
+        self.assertEqual(updated_supplier.products, sorted([2, 4, 1, 3, 5, 6]))
 
     def test_add_product_duplicate(self):
         """
-        Create a supplier and add duplicate products. Assert DuplicateProduct is raised
+        Create a supplier and add duplicate products.
+        Assert DuplicateProduct is raised
         """
         supplier = Supplier(name="Ken",
                             email="Ken@gmail.com", products=set([2, 4]))
@@ -248,5 +248,5 @@ class TestSupplierModel(unittest.TestCase):
                             email="Ken@gmail.com")
         supplier.create()
         supplier.add_products([1, 3])
-        updated_supplier = Supplier.find(supplier.id)
+        updated_supplier = Supplier.find_first(supplier.id)
         self.assertEqual(updated_supplier.products, [1, 3])
