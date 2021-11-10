@@ -361,3 +361,41 @@ class TestSupplierServer(unittest.TestCase):
             content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_supplier_does_not_exist(self):
+        """
+        Delete a supplier which does not exist
+        """
+        resp = self.app.delete("/suppliers/0")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_supplier_successful_case(self):
+        """
+        Delete a supplier that exists
+        """
+
+        # first create a new Supplier
+        test_supplier = self._create_suppliers(1)[0]
+
+        # verify that the test_supplier can be found before deletion
+        resp = self.app.get(
+            "/suppliers/{}".format(test_supplier.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], test_supplier.name, "Name does not match")
+        self.assertEqual(data["email"], test_supplier.email, "Email does not match")
+        self.assertEqual(data["address"], test_supplier.address, "Address does not match")
+        self.assertEqual(data["products"], test_supplier.products, "Products does not match")
+
+        # Delete supplier
+        resp = self.app.delete("/suppliers/{}".format(test_supplier.id))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # verify that it has been deleted and cannot be found
+        resp = self.app.get("/suppliers/{}".format(test_supplier.id))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # verify that it has been deleted and it still returns 204
+        resp = self.app.delete("/suppliers/{}".format(test_supplier.id))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)

@@ -210,6 +210,13 @@ class Supplier(db.Model):
         db.session.commit()
         return self
 
+    def delete(self) -> None:
+        """
+        Deletes a supplier by its id in database
+        """
+        db.session.delete(self)
+        db.session.commit()
+
     def add_products(self, products: Union[List[int], Set[int]]) -> "Supplier":
         """
         Adds the list of suppliers to self and commits to database.

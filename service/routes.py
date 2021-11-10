@@ -13,7 +13,7 @@ DELETE /suppliers/{id} - deletes a Supplier record in the database
 import json
 from typing import Tuple
 from flask import jsonify, Response, request, make_response
-from werkzeug.exceptions import abort, BadRequest
+from werkzeug.exceptions import abort, BadRequest, NotFound
 from service import status, app
 from service.supplier import Supplier
 
@@ -128,6 +128,23 @@ def add_product(supplier_id: int) -> Tuple[Response, int]:
         return make_response(jsonify(message), status.HTTP_200_OK)
     except KeyError:
         raise BadRequest("products not provided")
+
+@app.route("/suppliers/<int:supplier_id>", methods=["DELETE"])
+def delete_supplier(supplier_id: int) -> Tuple[Response, int]:
+    """
+    Deletes a supplier with the provided supplier id
+    Returns the deleted supplier if the supplier exists
+    """
+    app.logger.info("delete supplier with id {}".format(supplier_id))
+
+    try:
+        supplier = Supplier.find_first(supplier_id)
+        supplier.delete()
+        app.logger.info("Supplier with id {} has been deleted.".format(supplier_id))
+    except NotFound:
+        app.logger.info("Supplier with id {} does not exist.".format(supplier_id))
+    finally:
+        return make_response(jsonify({}), status.HTTP_204_NO_CONTENT)
 
 
 ######################################################################
