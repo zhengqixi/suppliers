@@ -13,8 +13,6 @@ $(function () {
     /// Clears all form fields
     function clear_form_data() {
         $("#supplier_name").val("");
-        $("#supplier_category").val("");
-        $("#supplier_available").val("");
     }
 
     // Updates the flash message area
