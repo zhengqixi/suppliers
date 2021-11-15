@@ -25,8 +25,7 @@ from service.supplier import Supplier
 def index() -> Tuple[Response, int]:
     """ Return a message about the service """
     app.logger.info("Request for Index page")
-    message = "Hello World from Supplier team"
-    return make_response(jsonify(name=message), status.HTTP_200_OK)
+    return app.send_static_file("index.html") 
 
 
 @app.route("/suppliers", methods=["POST"])

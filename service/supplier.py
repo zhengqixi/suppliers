@@ -85,12 +85,6 @@ class Supplier(db.Model):
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
-    def all(cls) -> List["Supplier"]:
-        """Returns all of the suppliers in the database"""
-        logger.info("Processing all suppliers")
-        return cls.query.all()
-
-    @classmethod
     def list(cls) -> List["Supplier"]:
         """List all suppliers"""
         return Supplier.query.all()
