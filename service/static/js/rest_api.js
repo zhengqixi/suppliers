@@ -29,13 +29,13 @@ $(function () {
 
     $("#create-btn").click(function () {
 
-        var name = $("#supplier_name").val();
+        let name = $("#supplier_name").val();
 
-        var data = {
+        let data = {
             "name": name,
         };
 
-        var ajax = $.ajax({
+        let ajax = $.ajax({
             type: "POST",
             url: "/suppliers",
             contentType: "application/json",
@@ -59,14 +59,14 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var supplier_id = $("#supplier_id").val();
-        var name = $("#supplier_name").val();
+        let supplier_id = $("#supplier_id").val();
+        let name = $("#supplier_name").val();
 
-        var data = {
+        let data = {
             "name": name,
         };
 
-        var ajax = $.ajax({
+        let ajax = $.ajax({
                 type: "PUT",
                 url: "/suppliers/" + supplier_id,
                 contentType: "application/json",
@@ -90,9 +90,9 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
 
-        var supplier_id = $("#supplier_id").val();
+        let supplier_id = $("#supplier_id").val();
 
-        var ajax = $.ajax({
+        let ajax = $.ajax({
             type: "GET",
             url: "/suppliers/" + supplier_id,
             contentType: "application/json",
@@ -118,9 +118,9 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var supplier_id = $("#supplier_id").val();
+        let supplier_id = $("#supplier_id").val();
 
-        var ajax = $.ajax({
+        let ajax = $.ajax({
             type: "DELETE",
             url: "/suppliers/" + supplier_id,
             contentType: "application/json",
@@ -152,15 +152,15 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        var name = $("#supplier_name").val();
+        let name = $("#supplier_name").val();
 
-        var queryString = ""
+        let queryString = ""
 
         if (name) {
             queryString += 'name=' + name
         }
 
-        var ajax = $.ajax({
+        let ajax = $.ajax({
             type: "GET",
             url: "/suppliers?" + queryString,
             contentType: "application/json",
@@ -171,14 +171,14 @@ $(function () {
             //alert(res.toSource())
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
-            var header = '<tr>'
+            let header = '<tr>'
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:40%">Name</th>'
             $("#search_results").append(header);
-            var firstSupplier = "";
-            for(var i = 0; i < res.length; i++) {
-                var supplier = res[i];
-                var row = "<tr><td>"+supplier._id+"</td><td>"+supplier.name+"</td></tr>";
+            let firstSupplier = "";
+            for(let i = 0; i < res.length; i++) {
+                let supplier = res[i];
+                let row = "<tr><td>"+supplier._id+"</td><td>"+supplier.name+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstSupplier = supplier;
