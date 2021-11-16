@@ -1,4 +1,6 @@
 $(function () {
+    const baseUrl = "/api/suppliers";
+    const contentType = "application/json"
 
     // ****************************************
     //  U T I L I T Y   F U N C T I O N S
@@ -35,8 +37,8 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: "/suppliers",
-            contentType: "application/json",
+            url: baseUrl,
+            contentType: contentType,
             data: JSON.stringify(data),
         });
 
@@ -46,7 +48,7 @@ $(function () {
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.error);
         });
     });
 
@@ -66,8 +68,8 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: "/suppliers/" + supplier_id,
-                contentType: "application/json",
+                url: `${baseUrl}/${supplier_id}`,
+                contentType: contentType,
                 data: JSON.stringify(data)
             })
 
@@ -77,7 +79,7 @@ $(function () {
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.error)
         });
 
     });
@@ -92,8 +94,8 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: "/suppliers/" + supplier_id,
-            contentType: "application/json",
+            url: `${baseUrl}/${supplier_id}`,
+            contentType: contentType,
             data: ''
         })
 
@@ -105,7 +107,7 @@ $(function () {
 
         ajax.fail(function(res){
             clear_form_data()
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.error)
         });
 
     });
@@ -120,8 +122,8 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: "/suppliers/" + supplier_id,
-            contentType: "application/json",
+            url: `${baseUrl}/${supplier_id}`, 
+            contentType: contentType,
             data: '',
         })
 
@@ -131,7 +133,7 @@ $(function () {
         });
 
         ajax.fail(function(res){
-            flash_message("Server error!")
+            flash_message(res.responseJSON.error)
         });
     });
 
@@ -160,8 +162,8 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: "/suppliers?" + queryString,
-            contentType: "application/json",
+            url: `${baseUrl}?${queryString}`,
+            contentType: contentType,
             data: ''
         })
 
@@ -194,7 +196,7 @@ $(function () {
         });
 
         ajax.fail(function(res){
-            flash_message(res.responseJSON.message)
+            flash_message(res.responseJSON.error)
         });
 
     });
